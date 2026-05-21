@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import Image from "next/image";
 import { ArrowRight, ChevronLeft, ChevronRight } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 
 /* ═══════════════════════════════════════════
    SLIDE DATA
@@ -37,7 +38,7 @@ const slides: Slide[] = [
     ],
     subtitle:
       "Traditionally extracted using authentic Mara Chekku methods to preserve natural aroma, nutrients, and purity — the way it was meant to be.",
-    image: "/products/Groundnut_Oil_1_Ltr-removebg-preview.png",
+    image: "/products/groundnut-bg-removed.png",
     imageAlt:
       "Minaliya Pure Cold Pressed Groundnut Oil — Mara Chekku Wood Pressed",
     accentColor: "#C47700",
@@ -59,7 +60,7 @@ const slides: Slide[] = [
     ],
     subtitle:
       "Gingelly oil extracted the traditional way — rich in antioxidants, perfect for authentic South Indian cooking and Ayurvedic wellness.",
-    image: "/products/Sesame_Oil_1_Ltr-removebg-preview.png",
+    image: "/products/sesame-bg-removed.png",
     imageAlt:
       "Minaliya Pure Cold Pressed Sesame Gingelly Oil — Traditional Extraction",
     accentColor: "#C4612A",
@@ -81,7 +82,7 @@ const slides: Slide[] = [
     ],
     subtitle:
       "From fresh Kerala coconuts to your kitchen — our wood-pressed coconut oil retains every natural nutrient for cooking, skin, and hair care.",
-    image: "/products/Coconut_Oil_1_Ltr-removebg-preview.png",
+    image: "/products/coconut-bg-removed.png",
     imageAlt:
       "Minaliya Pure Cold Pressed Coconut Oil — Chemical Free Virgin Oil",
     accentColor: "#2D6A2D",
@@ -102,28 +103,13 @@ const SLIDE_DURATION = 6500;
 
 export default function HeroSection() {
   const [current, setCurrent] = useState(0);
-  const [isTransitioning, setIsTransitioning] = useState(false);
-  const [mounted, setMounted] = useState(false);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const slide = slides[current];
 
-  useEffect(() => {
-    const t = setTimeout(() => setMounted(true), 100);
-    return () => clearTimeout(t);
+  const goTo = useCallback((idx: number) => {
+    setCurrent(idx);
   }, []);
-
-  const goTo = useCallback(
-    (idx: number) => {
-      if (isTransitioning) return;
-      setIsTransitioning(true);
-      setTimeout(() => {
-        setCurrent(idx);
-        setIsTransitioning(false);
-      }, 600);
-    },
-    [isTransitioning]
-  );
 
   useEffect(() => {
     timerRef.current = setTimeout(
@@ -141,12 +127,10 @@ export default function HeroSection() {
   return (
     <section
       id="hero"
-      className="relative w-full overflow-hidden h-screen"
+      className="relative w-full overflow-hidden h-auto lg:h-[calc(100vh-100px)] min-h-[580px] lg:min-h-0"
       aria-label="Hero product showcase"
     >
-      {/* ─── COLOR-MORPHING BACKGROUND ───
-          Three blobs that smoothly transition colors per slide.
-          CSS transition handles the color animation. */}
+      {/* ─── COLOR-MORPHING BACKGROUND ─── */}
       <div className="absolute inset-0 z-0" aria-hidden="true">
         {/* Base fill — smooth transition */}
         <div
@@ -200,8 +184,7 @@ export default function HeroSection() {
         <div
           className="absolute inset-0 flex items-center justify-center select-none pointer-events-none overflow-hidden"
           style={{
-            opacity: 0.05
-
+            opacity: 0.04
           }}
         >
           <span className="text-[21vw] font-bold tracking-tighter leading-none" style={{ fontFamily: "var(--font-display)" }}>
@@ -209,19 +192,19 @@ export default function HeroSection() {
           </span>
         </div>
 
-        {/* Floating Organic Drops to fill space */}
+        {/* Floating Organic Drops */}
         <div className="absolute inset-0 pointer-events-none" aria-hidden="true">
           {[...Array(5)].map((_, i) => (
             <div
               key={i}
               className="absolute rounded-full hero-animate-float"
               style={{
-                width: 15 + i * 10,
-                height: 15 + i * 10,
-                background: `radial-gradient(circle, ${slide.accentColor}40 0%, transparent 70%)`,
-                top: `${15 + i * 15}%`,
-                left: `${(i * 20 + 10) % 90}%`,
-                animationDelay: `${i * 0.8}s`,
+                width: 12 + i * 8,
+                height: 12 + i * 8,
+                background: `radial-gradient(circle, ${slide.accentColor}30 0%, transparent 70%)`,
+                top: `${20 + i * 12}%`,
+                left: `${(i * 22 + 15) % 90}%`,
+                animationDelay: `${i * 0.9}s`,
                 filter: "blur(2px)",
               }}
             />
@@ -230,7 +213,7 @@ export default function HeroSection() {
 
         {/* Subtle grain overlay */}
         <div
-          className="absolute inset-0 opacity-[0.02]"
+          className="absolute inset-0 opacity-[0.015]"
           style={{
             backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E")`,
             backgroundSize: "150px",
@@ -239,329 +222,294 @@ export default function HeroSection() {
       </div>
 
       {/* ─── MAIN CONTENT ─── */}
-      <div className="relative z-10 max-w-[1440px] mx-auto px-5 sm:px-8 lg:px-12 h-screen flex items-center">
-        <div className="w-full grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-6 items-center pt-20 lg:pt-0">
-          {/* ─── LEFT: TYPOGRAPHY ─── */}
-          <div className="lg:col-span-7 xl:col-span-6 relative z-20 order-2 lg:order-1 text-center lg:text-left">
-            <div
-              className={`space-y-5 sm:space-y-6 lg:space-y-8 transition-all duration-700 ease-out ${isTransitioning
-                ? "opacity-0 translate-y-6"
-                : "opacity-100 translate-y-0"
-                }`}
-            >
-              {/* Luxury label */}
-              <div
-                className={mounted ? "hero-reveal-left" : "opacity-0"}
-                style={{ animationDelay: "0.2s" }}
+      <div className="relative z-10 max-w-[1440px] mx-auto px-5 sm:px-8 lg:px-12 h-auto lg:h-full flex items-center py-10 lg:py-0">
+        <div className="w-full grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-6 items-center pt-14 lg:pt-0 pb-16 lg:pb-0">
+
+          {/* ─── LEFT: TYPOGRAPHY (Smooth Cinematic Transition) ─── */}
+          <div className="lg:col-span-7 xl:col-span-6 relative z-20 order-2 lg:order-1 text-center lg:text-left flex flex-col justify-center">
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={`content-${slide.id}`}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                transition={{ duration: 0.55, ease: [0.25, 1, 0.5, 1] }}
+                className="space-y-4 sm:space-y-5 lg:space-y-6"
               >
-                <div className="flex items-center gap-4 justify-center lg:justify-start">
+                {/* Luxury label */}
+                <div className="flex items-center gap-3 justify-center lg:justify-start">
                   <div
-                    className="h-px w-10 hero-line-expand"
-                    style={{
-                      background: slide.accentColor,
-                      animationDelay: "0.3s",
-                    }}
+                    className="h-px w-8 transition-colors duration-500"
+                    style={{ background: slide.accentColor }}
                   />
                   <span
-                    className="text-[11px] sm:text-xs font-semibold uppercase tracking-[0.25em]"
+                    className="text-[10px] sm:text-xs font-semibold uppercase tracking-[0.2em]"
                     style={{
-                      color: "var(--color-stone-500)",
+                      color: "var(--color-stone-600)",
                       fontFamily: "var(--font-body)",
                     }}
                   >
                     {slide.label}
                   </span>
                 </div>
-              </div>
 
-              {/* Headline */}
-              <h1 className="leading-[1.05] tracking-tight">
-                {slide.headlineParts.map((part, i) => (
-                  <span
-                    key={`${slide.id}-${i}`}
-                    className={`block overflow-hidden ${mounted ? "hero-reveal-up" : "opacity-0"
-                      }`}
-                    style={{ animationDelay: `${0.3 + i * 0.12}s` }}
-                  >
+                {/* Headline */}
+                <h1 className="leading-[1.1] tracking-tight">
+                  {slide.headlineParts.map((part, i) => (
                     <span
-                      className={`inline-block ${part.style === "display"
-                        ? "text-[clamp(2.5rem,6vw,5.5rem)] font-light"
+                      key={i}
+                      className={`inline-block mr-3 ${part.style === "display"
+                        ? "text-[clamp(2rem,4.5vw,4.6rem)] font-light block"
                         : part.style === "serif-italic"
-                          ? "text-[clamp(2.5rem,6vw,5.5rem)] font-normal italic"
-                          : "text-[clamp(1.8rem,4vw,3.2rem)] font-semibold"
+                          ? "text-[clamp(2rem,4.5vw,4.6rem)] font-normal italic block"
+                          : "text-[clamp(1.5rem,3vw,2.4rem)] font-semibold block mt-1"
                         }`}
                       style={{
                         fontFamily:
-                          part.style === "display"
-                            ? "var(--font-display)"
-                            : part.style === "serif-italic"
-                              ? "var(--font-display)"
-                              : "var(--font-body)",
+                          part.style === "sans"
+                            ? "var(--font-body)"
+                            : "var(--font-display)",
                         color:
                           part.style === "display"
                             ? "var(--color-stone-900)"
                             : part.style === "serif-italic"
                               ? "var(--color-forest-700)"
                               : "var(--color-stone-700)",
-                        lineHeight: part.style === "sans" ? "1.3" : "1.05",
+                        lineHeight: part.style === "sans" ? "1.2" : "1.1",
                       }}
                     >
                       {part.text}
                     </span>
-                  </span>
-                ))}
-              </h1>
+                  ))}
+                </h1>
 
-              {/* Accent line */}
-              <div
-                className={mounted ? "hero-line-expand" : "opacity-0"}
-                style={{ animationDelay: "0.8s" }}
-              >
-                <div
-                  className="h-[2px] w-20 transition-colors duration-[1200ms]"
-                  style={{
-                    background: `linear-gradient(90deg, ${slide.accentColor}, transparent)`,
-                  }}
-                />
-              </div>
-
-              {/* Subtitle */}
-              <p
-                className={`text-base sm:text-lg max-w-lg leading-[1.8] ${mounted ? "hero-reveal-up" : "opacity-0"
-                  }`}
-                style={{
-                  color: "var(--color-stone-500)",
-                  fontFamily: "var(--font-body)",
-                  fontWeight: 400,
-                  animationDelay: "0.7s",
-                }}
-              >
-                {slide.subtitle}
-              </p>
-
-              {/* CTAs */}
-              <div
-                className={`flex flex-wrap gap-3 sm:gap-4 pt-2 justify-center lg:justify-start ${mounted ? "hero-reveal-up" : "opacity-0"
-                  }`}
-                style={{ animationDelay: "0.9s" }}
-              >
-                <a
-                  href="/shop"
-                  className="group inline-flex items-center gap-3 px-6 py-3.5 sm:px-8 sm:py-4 rounded-full font-semibold text-sm sm:text-[15px] transition-all duration-500 hover:-translate-y-0.5"
-                  style={{
-                    background: "var(--color-stone-900)",
-                    color: "var(--color-cream-50)",
-                    fontFamily: "var(--font-body)",
-                    letterSpacing: "0.02em",
-                    boxShadow: "0 4px 24px rgba(26, 25, 23, 0.15)",
-                  }}
-                >
-                  Explore Collection
-                  <ArrowRight
-                    size={16}
-                    className="transition-transform duration-500 group-hover:translate-x-1"
+                {/* Accent line */}
+                <div>
+                  <div
+                    className="h-[2px] w-16 transition-colors duration-[1200ms]"
+                    style={{
+                      background: `linear-gradient(90deg, ${slide.accentColor}, transparent)`,
+                    }}
                   />
-                </a>
-                <a
-                  href="#process"
-                  className="inline-flex items-center gap-3 px-6 py-3.5 sm:px-8 sm:py-4 rounded-full font-medium text-sm sm:text-[15px] transition-all duration-500 hover:-translate-y-0.5"
+                </div>
+
+                {/* Subtitle */}
+                <p
+                  className="text-sm sm:text-base max-w-lg leading-relaxed"
                   style={{
-                    color: "var(--color-stone-700)",
+                    color: "var(--color-stone-600)",
                     fontFamily: "var(--font-body)",
-                    letterSpacing: "0.02em",
-                    border: "1.5px solid var(--color-stone-300)",
-                    background: "rgba(255, 255, 255, 0.35)",
-                    backdropFilter: "blur(8px)",
+                    fontWeight: 400,
                   }}
                 >
-                  Discover The Process
-                </a>
-              </div>
+                  {slide.subtitle}
+                </p>
 
-              {/* Trust stats */}
-              <div
-                className={`flex items-center gap-4 sm:gap-6 pt-4 sm:pt-6 justify-center lg:justify-start ${mounted ? "hero-reveal-up" : "opacity-0"
-                  }`}
-                style={{ animationDelay: "1.1s" }}
+                {/* CTAs */}
+                <div className="flex flex-wrap gap-3 pt-2 justify-center lg:justify-start">
+                  <a
+                    href="/shop"
+                    className="group inline-flex items-center gap-2.5 px-6 py-3 rounded-full font-semibold text-xs sm:text-sm transition-all duration-300 hover:-translate-y-0.5"
+                    style={{
+                      background: "var(--color-stone-900)",
+                      color: "var(--color-cream-50)",
+                      fontFamily: "var(--font-body)",
+                      letterSpacing: "0.02em",
+                      boxShadow: "0 4px 16px rgba(26, 25, 23, 0.1)",
+                    }}
+                  >
+                    Explore Collection
+                    <ArrowRight
+                      size={14}
+                      className="transition-transform duration-300 group-hover:translate-x-1"
+                    />
+                  </a>
+                  <a
+                    href="#process"
+                    className="inline-flex items-center gap-2.5 px-6 py-3 rounded-full font-medium text-xs sm:text-sm transition-all duration-300 hover:-translate-y-0.5"
+                    style={{
+                      color: "var(--color-stone-700)",
+                      fontFamily: "var(--font-body)",
+                      letterSpacing: "0.02em",
+                      border: "1.5px solid var(--color-stone-350)",
+                      background: "rgba(255, 255, 255, 0.4)",
+                      backdropFilter: "blur(6px)",
+                    }}
+                  >
+                    Discover The Process
+                  </a>
+                </div>
+
+                {/* Trust stats */}
+                <div className="flex items-center gap-5 pt-3 justify-center lg:justify-start">
+                  {[
+                    { value: "10,000+", label: "Families" },
+                    { value: "100%", label: "Chemical Free" },
+                    { value: "4.9", label: "Rating" },
+                  ].map((s) => (
+                    <div key={s.label} className="flex items-baseline gap-1.5">
+                      <span
+                        className="text-base font-bold"
+                        style={{
+                          fontFamily: "var(--font-display)",
+                          color: "var(--color-stone-800)",
+                        }}
+                      >
+                        {s.value}
+                      </span>
+                      <span
+                        className="text-[9px] uppercase tracking-wider font-semibold"
+                        style={{ color: "var(--color-stone-500)" }}
+                      >
+                        {s.label}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </motion.div>
+            </AnimatePresence>
+          </div>
+
+          {/* ─── RIGHT: CINEMATIC PRODUCT SHOWCASE ─── */}
+          <div className="lg:col-span-5 xl:col-span-6 relative flex items-center justify-center order-1 lg:order-2 min-h-[320px] lg:min-h-0">
+            {/* Spotlight gradient behind product */}
+            <div
+              className="absolute z-0 rounded-full transition-all duration-[1200ms] ease-in-out"
+              style={{
+                width: "min(80vw, 550px)",
+                height: "min(80vw, 550px)",
+                background: `radial-gradient(circle, ${slide.bg.primary}aa 0%, ${slide.bg.secondary}60 40%, transparent 70%)`,
+              }}
+              aria-hidden="true"
+            />
+
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={`image-${slide.id}`}
+                initial={{ opacity: 0, scale: 0.94, y: 15 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.94, y: -10 }}
+                transition={{ duration: 0.6, ease: [0.25, 1, 0.5, 1] }}
+                className="relative z-10"
               >
-                {[
-                  { value: "10,000+", label: "Families" },
-                  { value: "100%", label: "Chemical Free" },
-                  { value: "4.9", label: "Rating" },
-                ].map((s) => (
-                  <div key={s.label} className="flex items-baseline gap-1.5">
-                    <span
-                      className="text-lg font-bold"
+                {/* ── Product bottle ── */}
+                <div className="w-[290px] sm:w-[240px] md:w-[280px] lg:w-[290px] xl:w-[280px] hero-animate-float relative">
+                  <Image
+                    src={slide.image}
+                    alt={slide.imageAlt}
+                    width={450}
+                    height={675}
+                    className="w-full h-auto object-contain relative z-10"
+                    style={{
+                      filter: "drop-shadow(0 20px 30px rgba(0, 0, 0, 0.12))",
+                    }}
+                    priority
+                  />
+
+                  {/* Reflection beneath bottle */}
+                  <div
+                    className="absolute bottom-[-8%] left-[5%] right-[5%] h-[30%] z-0 overflow-hidden"
+                    style={{
+                      transform: "scaleY(-1) scaleX(0.92)",
+                      opacity: 0.08,
+                      maskImage:
+                        "linear-gradient(to top, rgba(0,0,0,0.5) 0%, transparent 80%)",
+                      WebkitMaskImage:
+                        "linear-gradient(to top, rgba(0,0,0,0.5) 0%, transparent 80%)",
+                    }}
+                    aria-hidden="true"
+                  >
+                    <Image
+                      src={slide.image}
+                      alt=""
+                      width={450}
+                      height={675}
+                      className="w-full h-auto object-contain"
+                      quality={50}
+                      aria-hidden="true"
+                    />
+                  </div>
+                </div>
+
+                {/* ── Side badge — positioned right ── */}
+                <div
+                  className="absolute -right-4 sm:-right-8 lg:-right-10 top-[28%] hero-animate-float-slow hidden sm:block"
+                  style={{ animationDelay: "1.2s" }}
+                >
+                  <div
+                    className="px-3.5 py-2.5 rounded-2xl text-center border border-white/40"
+                    style={{
+                      background: "rgba(255, 255, 255, 0.65)",
+                      backdropFilter: "blur(12px)",
+                      boxShadow: "0 8px 32px rgba(45, 43, 39, 0.05)",
+                    }}
+                  >
+                    <div
+                      className="text-[9px] font-semibold uppercase tracking-[0.15em]"
+                      style={{ color: "var(--color-stone-500)" }}
+                    >
+                      Mara Chekku
+                    </div>
+                    <div
+                      className="text-lg font-bold mt-0.5 leading-none"
                       style={{
                         fontFamily: "var(--font-display)",
                         color: "var(--color-stone-800)",
                       }}
                     >
-                      {s.value}
-                    </span>
-                    <span
-                      className="text-[10px] uppercase tracking-wider font-medium"
+                      100%
+                    </div>
+                    <div
+                      className="text-[8px] uppercase tracking-widest font-semibold"
                       style={{ color: "var(--color-stone-400)" }}
                     >
-                      {s.label}
-                    </span>
+                      Pure &amp; Natural
+                    </div>
                   </div>
-                ))}
-              </div>
-            </div>
-          </div>
-
-          {/* ─── RIGHT: CINEMATIC PRODUCT SHOWCASE ─── */}
-          <div className="lg:col-span-5 xl:col-span-6 relative flex items-center justify-center order-1 lg:order-2">
-            {/* Spotlight gradient behind product */}
-            <div
-              className="absolute z-0 rounded-full transition-all duration-[1200ms] ease-in-out lg:-translate-x-16 lg:-translate-y-12"
-              style={{
-                width: "min(85vw, 700px)",
-                height: "min(85vw, 700px)",
-                background: `radial-gradient(circle, ${slide.bg.primary}99 0%, ${slide.bg.secondary}50 45%, transparent 70%)`,
-              }}
-              aria-hidden="true"
-            />
-
-            {/* Decorative arc */}
-            <div
-              className="absolute z-0 rounded-full transition-all duration-[1200ms] hidden sm:block lg:-translate-x-16 lg:-translate-y-12"
-              style={{
-                width: "min(70vw, 540px)",
-                height: "min(70vw, 540px)",
-                border: `1.5px dashed ${slide.accentColor}25`,
-                animation: "spin 60s linear infinite",
-              }}
-              aria-hidden="true"
-            />
-
-            <div
-              className={`relative z-10 transition-all duration-700 ease-out lg:-translate-x-16 lg:-translate-y-12 ${isTransitioning
-                ? "opacity-0 scale-[0.88] translate-y-6"
-                : "opacity-100 scale-100 translate-y-0"
-                } ${mounted ? "hero-scale-in" : "opacity-0"}`}
-              style={{ animationDelay: "0.5s" }}
-            >
-              {/* ── Product bottle — MASSIVE ── */}
-              <div className="w-[380px] sm:w-[450px] md:w-[500px] lg:w-[550px] xl:w-[650px] hero-animate-float relative">
-                <Image
-                  src={slide.image}
-                  alt={slide.imageAlt}
-                  width={600}
-                  height={900}
-                  className="w-full h-auto object-contain relative z-10"
-                  priority
-                  quality={90}
-                  style={{
-                    filter: "drop-shadow(0 20px 40px rgba(45, 43, 39, 0.15))",
-                  }}
-                />
-
-                {/* Reflection beneath bottle */}
-                <div
-                  className="absolute bottom-[-8%] left-[5%] right-[5%] h-[30%] z-0 overflow-hidden"
-                  style={{
-                    transform: "scaleY(-1) scaleX(0.92)",
-                    opacity: 0.12,
-                    maskImage:
-                      "linear-gradient(to top, rgba(0,0,0,0.5) 0%, transparent 80%)",
-                    WebkitMaskImage:
-                      "linear-gradient(to top, rgba(0,0,0,0.5) 0%, transparent 80%)",
-                  }}
-                  aria-hidden="true"
-                >
-                  <Image
-                    src={slide.image}
-                    alt=""
-                    width={600}
-                    height={900}
-                    className="w-full h-auto object-contain"
-                    quality={50}
-                    aria-hidden="true"
-                  />
                 </div>
-              </div>
 
-              {/* ── Side badge — positioned right ── */}
-              <div
-                className="absolute -right-2 sm:-right-6 lg:-right-8 top-[28%] hero-animate-float-slow hidden sm:block"
-                style={{ animationDelay: "1.2s" }}
-              >
+                {/* ── Bottom badge ── */}
                 <div
-                  className="px-4 py-3 rounded-2xl text-center"
-                  style={{
-                    background: "rgba(255, 255, 255, 0.75)",
-                    backdropFilter: "blur(16px)",
-                    border: "1px solid rgba(255, 255, 255, 0.5)",
-                    boxShadow: "0 8px 32px rgba(45, 43, 39, 0.08)",
-                  }}
+                  className="absolute -bottom-4 left-1/2 -translate-x-1/2 hero-animate-float-slow hidden sm:block"
+                  style={{ animationDelay: "1s" }}
                 >
                   <div
-                    className="text-[10px] font-semibold uppercase tracking-[0.15em]"
-                    style={{ color: "var(--color-stone-500)" }}
-                  >
-                    Mara Chekku
-                  </div>
-                  <div
-                    className="text-[22px] font-bold mt-0.5 leading-none"
+                    className="px-5 py-2 rounded-full text-[10px] font-semibold uppercase tracking-[0.15em] whitespace-nowrap border border-white/40"
                     style={{
-                      fontFamily: "var(--font-display)",
-                      color: "var(--color-stone-800)",
+                      background: "rgba(255, 255, 255, 0.65)",
+                      backdropFilter: "blur(12px)",
+                      color: "var(--color-stone-600)",
+                      boxShadow: "0 8px 32px rgba(45, 43, 39, 0.05)",
                     }}
                   >
-                    100%
-                  </div>
-                  <div
-                    className="text-[9px] uppercase tracking-widest font-medium"
-                    style={{ color: "var(--color-stone-400)" }}
-                  >
-                    Pure &amp; Natural
+                    {slide.badge}
                   </div>
                 </div>
-              </div>
-
-              {/* ── Bottom badge ── */}
-              <div
-                className="absolute -bottom-6 left-1/2 -translate-x-1/2 hero-animate-float-slow hidden sm:block"
-                style={{ animationDelay: "1s" }}
-              >
-                <div
-                  className="px-6 py-2.5 rounded-full text-[11px] font-semibold uppercase tracking-[0.15em] whitespace-nowrap"
-                  style={{
-                    background: "rgba(255, 255, 255, 0.75)",
-                    backdropFilter: "blur(16px)",
-                    border: "1px solid rgba(255, 255, 255, 0.5)",
-                    color: "var(--color-stone-600)",
-                    boxShadow: "0 8px 32px rgba(45, 43, 39, 0.08)",
-                  }}
-                >
-                  {slide.badge}
-                </div>
-              </div>
-            </div>
+              </motion.div>
+            </AnimatePresence>
           </div>
+
         </div>
       </div>
 
       {/* ─── BOTTOM CONTROLS ─── */}
       <div className="absolute bottom-0 left-0 right-0 z-30">
-        <div className="max-w-[1440px] mx-auto px-5 sm:px-8 lg:px-12 pb-6 sm:pb-10">
+        <div className="max-w-[1440px] mx-auto px-5 sm:px-8 lg:px-12 pb-6 sm:pb-8 lg:pb-10">
           <div className="flex items-center justify-between">
             {/* Slide indicators */}
-            <div className="flex items-center gap-5">
+            <div className="flex items-center gap-4">
               {slides.map((s, i) => (
                 <button
                   key={s.id}
                   onClick={() => goTo(i)}
-                  className="group flex items-center gap-3"
+                  className="group flex items-center gap-2"
                   aria-label={`Go to slide ${i + 1}: ${s.badge}`}
                   aria-current={i === current ? "true" : undefined}
                 >
                   <div
                     className="relative overflow-hidden rounded-full transition-all duration-500"
                     style={{
-                      width: i === current ? 48 : 24,
+                      width: i === current ? 40 : 20,
                       height: 3,
                     }}
                   >
@@ -586,7 +534,7 @@ export default function HeroSection() {
                     )}
                   </div>
                   <span
-                    className="text-[10px] font-medium uppercase tracking-wider hidden sm:inline transition-colors"
+                    className="text-[9px] font-semibold uppercase tracking-wider hidden sm:inline transition-colors"
                     style={{
                       color:
                         i === current
@@ -604,35 +552,34 @@ export default function HeroSection() {
             <div className="flex items-center gap-2">
               <button
                 onClick={prev}
-                className="w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 hover:scale-110"
+                className="w-9 h-9 rounded-full flex items-center justify-center transition-all duration-300 hover:scale-110 border"
                 style={{
-                  border: "1px solid var(--color-stone-300)",
+                  borderColor: "var(--color-stone-300)",
                   color: "var(--color-stone-600)",
-                  background: "rgba(255, 255, 255, 0.45)",
-                  backdropFilter: "blur(8px)",
+                  background: "rgba(255, 255, 255, 0.4)",
+                  backdropFilter: "blur(6px)",
                 }}
                 aria-label="Previous slide"
               >
-                <ChevronLeft size={18} />
+                <ChevronLeft size={16} />
               </button>
               <button
                 onClick={next}
-                className="w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 hover:scale-110"
+                className="w-9 h-9 rounded-full flex items-center justify-center transition-all duration-300 hover:scale-110 border"
                 style={{
-                  border: "1px solid var(--color-stone-300)",
+                  borderColor: "var(--color-stone-300)",
                   color: "var(--color-stone-600)",
-                  background: "rgba(255, 255, 255, 0.45)",
-                  backdropFilter: "blur(8px)",
+                  background: "rgba(255, 255, 255, 0.4)",
+                  backdropFilter: "blur(6px)",
                 }}
                 aria-label="Next slide"
               >
-                <ChevronRight size={18} />
+                <ChevronRight size={16} />
               </button>
             </div>
           </div>
         </div>
       </div>
-
 
     </section>
   );

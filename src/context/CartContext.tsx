@@ -33,7 +33,9 @@ function loadCart(): CartItem[] {
   if (typeof window === "undefined") return [];
   try {
     const stored = localStorage.getItem(STORAGE_KEY);
-    return stored ? JSON.parse(stored) : [];
+    if (!stored) return [];
+    const parsed = JSON.parse(stored);
+    return Array.isArray(parsed) ? parsed : [];
   } catch {
     return [];
   }
@@ -118,8 +120,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const closeCart = useCallback(() => setIsOpen(false), []);
   const toggleCart = useCallback(() => setIsOpen((o) => !o), []);
 
-  const totalItems = items.reduce((sum, i) => sum + i.quantity, 0);
-  const totalPrice = items.reduce((sum, i) => sum + i.price * i.quantity, 0);
+  const totalItems = Array.isArray(items) ? items.reduce((sum, i) => sum + i.quantity, 0) : 0;
+  const totalPrice = Array.isArray(items) ? items.reduce((sum, i) => sum + i.price * i.quantity, 0) : 0;
 
   return (
     <CartContext.Provider

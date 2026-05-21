@@ -24,11 +24,11 @@ export async function getAdminDashboardStats() {
     ]);
 
   const totalRevenue = orders.reduce(
-    (sum: number, order) => sum + Number(order.totalAmount),
+    (sum: number, order: any) => sum + Number(order.totalAmount),
     0
   );
   const pendingOrders = orders.filter(
-    (order) => order.status === "PENDING" || order.status === "PROCESSING"
+    (order: any) => order.status === "PENDING" || order.status === "PROCESSING"
   ).length;
 
   return {
@@ -114,7 +114,7 @@ export async function getAllInquiries() {
     },
   });
 
-  return inquiries.map((inquiry) => ({
+  return inquiries.map((inquiry: any) => ({
     id: inquiry.id,
     name: inquiry.name,
     company: inquiry.company,

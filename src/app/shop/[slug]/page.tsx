@@ -139,6 +139,7 @@ async function getProductBySlug(slug: string): Promise<ProductData | null> {
   };
 }
 
+
 export async function generateStaticParams() {
   const dbProducts = await prisma.product.findMany({
     select: { slug: true },

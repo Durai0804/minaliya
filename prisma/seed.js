@@ -36,7 +36,11 @@ const productsData = [
     price: 449.00,
     discountPrice: 349.00,
     stock: 150,
-    images: ["/products/Groundnut Oil 1 Ltr.jpg"],
+    images: [
+      "/products/Groundnut Oil 1 Ltr.jpg",
+      "/products/Groundnut Oil 500 ml.jpg",
+      "/products/groundnut-bg-removed.png"
+    ],
     isFeatured: true,
     categorySlug: "groundnut",
     specifications: {
@@ -53,7 +57,11 @@ const productsData = [
     price: 499.00,
     discountPrice: 399.00,
     stock: 120,
-    images: ["/products/Coconut Oil 1 Ltr.jpg"],
+    images: [
+      "/products/Coconut Oil 1 Ltr.jpg",
+      "/products/Coconut Oil 500 ml.jpg",
+      "/products/coconut-bg-removed.png"
+    ],
     isFeatured: true,
     categorySlug: "coconut",
     specifications: {
@@ -70,7 +78,11 @@ const productsData = [
     price: 479.00,
     discountPrice: 379.00,
     stock: 100,
-    images: ["/products/Sesame Oil 1 Ltr.jpg"],
+    images: [
+      "/products/Sesame Oil 1 Ltr.jpg",
+      "/products/Sesame Oil 500 ml.jpg",
+      "/products/sesame-bg-removed.png"
+    ],
     isFeatured: true,
     categorySlug: "sesame",
     specifications: {
@@ -87,7 +99,10 @@ const productsData = [
     price: 259.00,
     discountPrice: 199.00,
     stock: 200,
-    images: ["/products/Groundnut Oil 500 ml.jpg"],
+    images: [
+      "/products/Groundnut Oil 500 ml.jpg",
+      "/products/groundnut-bg-removed.png"
+    ],
     isFeatured: false,
     categorySlug: "groundnut",
     specifications: {
@@ -104,7 +119,10 @@ const productsData = [
     price: 299.00,
     discountPrice: 229.00,
     stock: 180,
-    images: ["/products/Coconut Oil 500 ml.jpg"],
+    images: [
+      "/products/Coconut Oil 500 ml.jpg",
+      "/products/coconut-bg-removed.png"
+    ],
     isFeatured: false,
     categorySlug: "coconut",
     specifications: {
@@ -121,7 +139,10 @@ const productsData = [
     price: 269.00,
     discountPrice: 209.00,
     stock: 150,
-    images: ["/products/Sesame Oil 500 ml.jpg"],
+    images: [
+      "/products/Sesame Oil 500 ml.jpg",
+      "/products/sesame-bg-removed.png"
+    ],
     isFeatured: false,
     categorySlug: "sesame",
     specifications: {
