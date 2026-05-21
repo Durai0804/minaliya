@@ -3,12 +3,16 @@ import AnnouncementBar from "@/components/layout/AnnouncementBar";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import ProductDetail from "@/components/shop/ProductDetail";
+import prisma from "@/lib/prisma";
 
-/* ═══════════════════════════════════════════
-   PRODUCT DATA
-   ═══════════════════════════════════════════ */
+const slugRedirects: Record<string, string> = {
+  "groundnut-oil-500ml": "groundnut-oil",
+  "coconut-oil-500ml": "coconut-oil",
+  "sesame-oil-500ml": "sesame-oil",
+};
 
 interface ProductData {
+  id: string;
   name: string;
   slug: string;
   tagline: string;
@@ -19,166 +23,129 @@ interface ProductData {
   rating: number;
   reviews: number;
   badge?: string;
-  sizes: { label: string; price: number; originalPrice: number }[];
+  sizes: { label: string; price: number; originalPrice: number; slug: string }[];
   category: string;
   benefits: string[];
   specifications: { label: string; value: string }[];
   usage: string[];
 }
 
-const products: Record<string, ProductData> = {
-  "groundnut-oil": {
-    name: "Cold Pressed Groundnut Oil",
-    slug: "groundnut-oil",
-    tagline: "The Heart of South Indian Cooking",
-    description:
-      "Our cold pressed groundnut oil is extracted using the traditional Mara Chekku method — a wooden press that slowly crushes premium groundnuts at temperatures below 50°C. This preserves the natural aroma, flavor, and all essential nutrients that refined oils destroy. Rich in Vitamin E, monounsaturated fats, and natural antioxidants, this oil is the healthiest choice for everyday Indian cooking.\n\nEvery bottle of Minaliya Groundnut Oil carries the authentic taste that South Indian families have cherished for generations. From crispy dosas to aromatic biryanis, from traditional sweets to daily tempering — experience the difference that pure, chemical-free oil makes.",
-    images: [
-      "/products/Groundnut Oil 1 Ltr.jpg",
-      "/products/Groundnut Oil 500 ml.jpg",
-      "/products/Groundnut_Oil_1_Ltr-removebg-preview.png",
-    ],
-    price: 349,
-    originalPrice: 449,
-    rating: 4.9,
-    reviews: 234,
-    badge: "Bestseller",
-    sizes: [
-      { label: "500ml", price: 199, originalPrice: 259 },
-      { label: "1 Ltr", price: 349, originalPrice: 449 },
-    ],
-    category: "Groundnut",
-    benefits: [
+async function getProductBySlug(slug: string): Promise<ProductData | null> {
+  const resolvedSlug = slugRedirects[slug] || slug;
+
+  const dbProduct = await prisma.product.findUnique({
+    where: { slug: resolvedSlug },
+    include: { category: true },
+  });
+
+  if (!dbProduct) return null;
+
+  // Get sibling products in the same category for sizes
+  const siblings = await prisma.product.findMany({
+    where: { categoryId: dbProduct.categoryId },
+    orderBy: { price: "asc" },
+  });
+
+  const sizes = siblings.map((sib) => ({
+    label: sib.slug.includes("500ml") ? "500ml" : "1 Ltr",
+    price: sib.discountPrice ? Number(sib.discountPrice) : Number(sib.price),
+    originalPrice: Number(sib.price),
+    slug: sib.slug,
+  }));
+
+  // Define narrative rich content based on category
+  const catSlug = dbProduct.category.slug;
+  let tagline = "100% Pure Wooden Pressed Oil";
+  let benefits: string[] = [];
+  let usage: string[] = [];
+
+  if (catSlug === "groundnut") {
+    tagline = "The Heart of South Indian Cooking";
+    benefits = [
       "Rich in Vitamin E and natural antioxidants",
       "High in heart-healthy monounsaturated fats",
       "Contains zero trans fats and no cholesterol",
       "Boosts immunity and improves digestion",
       "Ideal smoking point for Indian cooking methods",
       "100% chemical-free — no hexane, no bleaching",
-    ],
-    specifications: [
-      { label: "Oil Type", value: "Cold Pressed Groundnut Oil" },
-      { label: "Extraction", value: "Mara Chekku (Wooden Press)" },
-      { label: "Temperature", value: "Below 50°C" },
-      { label: "Shelf Life", value: "6-8 Months" },
-      { label: "Storage", value: "Cool, dry place away from sunlight" },
-      { label: "Origin", value: "Tamil Nadu, India" },
-      { label: "Certifications", value: "FSSAI Approved" },
-      { label: "Packaging", value: "Food-grade PET Bottle" },
-    ],
-    usage: [
+    ];
+    usage = [
       "Everyday cooking and deep frying",
       "Traditional South Indian dishes — dosa, sambar, rasam",
       "Seasoning and tempering (tadka)",
       "Baking and sweets preparation",
       "Salad dressings and marinades",
-    ],
-  },
-  "coconut-oil": {
-    name: "Cold Pressed Coconut Oil",
-    slug: "coconut-oil",
-    tagline: "Nature's Purest Gift",
-    description:
-      "Our virgin cold pressed coconut oil is made from fresh Kerala coconuts, extracted using traditional wooden press methods. Unlike refined coconut oil that undergoes chemical processing, our oil retains the natural fragrance, taste, and complete nutritional profile of fresh coconuts.\n\nThis multipurpose oil is perfect for South Indian and Kerala cooking, offering a subtle coconut aroma that enhances every dish. Beyond the kitchen, it's a natural moisturizer for skin, a nourishing hair oil, and has been used in Ayurvedic practices for centuries. Pure, versatile, and entirely chemical-free.",
-    images: [
-      "/products/Coconut Oil 1 Ltr.jpg",
-      "/products/Coconut Oil 500 ml.jpg",
-      "/products/Coconut_Oil_1_Ltr-removebg-preview.png",
-    ],
-    price: 399,
-    originalPrice: 499,
-    rating: 4.8,
-    reviews: 189,
-    badge: "Popular",
-    sizes: [
-      { label: "500ml", price: 229, originalPrice: 299 },
-      { label: "1 Ltr", price: 399, originalPrice: 499 },
-    ],
-    category: "Coconut",
-    benefits: [
+    ];
+  } else if (catSlug === "coconut") {
+    tagline = "Nature's Purest Gift";
+    benefits = [
       "Rich in lauric acid — boosts immunity naturally",
       "Contains medium-chain triglycerides (MCTs) for energy",
       "Excellent natural moisturizer for skin and hair",
       "Supports healthy metabolism and weight management",
       "Anti-bacterial and anti-fungal properties",
       "100% virgin, unrefined, and chemical-free",
-    ],
-    specifications: [
-      { label: "Oil Type", value: "Virgin Cold Pressed Coconut Oil" },
-      { label: "Extraction", value: "Wooden Press (Cold Process)" },
-      { label: "Temperature", value: "Below 50°C" },
-      { label: "Shelf Life", value: "6-8 Months" },
-      { label: "Storage", value: "Cool, dry place (solidifies below 25°C — normal)" },
-      { label: "Origin", value: "Kerala & Tamil Nadu, India" },
-      { label: "Certifications", value: "FSSAI Approved" },
-      { label: "Packaging", value: "Food-grade PET Bottle" },
-    ],
-    usage: [
+    ];
+    usage = [
       "Kerala and South Indian cooking",
       "Hair oiling and scalp massage",
       "Natural skin moisturizer",
       "Oil pulling for oral health",
       "Baking as a butter substitute",
-    ],
-  },
-  "sesame-oil": {
-    name: "Cold Pressed Sesame Oil",
-    slug: "sesame-oil",
-    tagline: "The Heart of Tamil Cuisine",
-    description:
-      "Our cold pressed sesame oil (Nallennai / Gingelly oil) is a cornerstone of South Indian cooking and Ayurvedic tradition. Extracted from premium sesame seeds using a traditional wooden press, this oil carries the rich, nutty aroma that has defined Tamil cuisine for centuries.\n\nSesame oil is one of the most nutrient-dense cooking oils — packed with sesamol and sesamin, powerful antioxidants unique to sesame. It's revered in Ayurveda for its warming properties and is used extensively in traditional medicine, massage therapy, and daily cooking across South India.",
-    images: [
-      "/products/Sesame Oil 1 Ltr.jpg",
-      "/products/Sesame Oil 500 ml.jpg",
-      "/products/Sesame_Oil_1_Ltr-removebg-preview.png",
-    ],
-    price: 379,
-    originalPrice: 479,
-    rating: 4.9,
-    reviews: 156,
-    sizes: [
-      { label: "500ml", price: 209, originalPrice: 269 },
-      { label: "1 Ltr", price: 379, originalPrice: 479 },
-    ],
-    category: "Sesame",
-    benefits: [
+    ];
+  } else if (catSlug === "sesame") {
+    tagline = "The Heart of Tamil Cuisine";
+    benefits = [
       "Rich in sesamol and sesamin — powerful antioxidants",
       "Supports bone health with natural calcium and zinc",
       "Anti-inflammatory properties for joint health",
       "Promotes heart health and lowers blood pressure",
       "Used in Ayurvedic oil massage (Abhyanga) for centuries",
       "100% pure — no blending, no chemical processing",
-    ],
-    specifications: [
-      { label: "Oil Type", value: "Cold Pressed Sesame Oil (Gingelly)" },
-      { label: "Extraction", value: "Mara Chekku (Wooden Press)" },
-      { label: "Temperature", value: "Below 50°C" },
-      { label: "Shelf Life", value: "6-8 Months" },
-      { label: "Storage", value: "Cool, dry place away from sunlight" },
-      { label: "Origin", value: "Tamil Nadu, India" },
-      { label: "Certifications", value: "FSSAI Approved" },
-      { label: "Packaging", value: "Food-grade PET Bottle" },
-    ],
-    usage: [
+    ];
+    usage = [
       "Traditional South Indian cooking and tempering",
       "Gingelly oil for Tamil festival dishes",
       "Ayurvedic body massage and oil pulling",
       "Salad dressings and cold preparations",
       "Baby massage oil (traditional practice)",
-    ],
-  },
-};
+    ];
+  }
 
-/* Duplicate entries for 500ml variants — redirect to parent */
-const slugRedirects: Record<string, string> = {
-  "groundnut-oil-500ml": "groundnut-oil",
-  "coconut-oil-500ml": "coconut-oil",
-  "sesame-oil-500ml": "sesame-oil",
-};
+  const specs = dbProduct.specifications
+    ? Object.entries(dbProduct.specifications as Record<string, string>).map(([label, value]) => ({
+        label,
+        value,
+      }))
+    : [];
 
-export function generateStaticParams() {
+  return {
+    id: dbProduct.id,
+    name: dbProduct.name,
+    slug: dbProduct.slug,
+    tagline,
+    description: dbProduct.description,
+    images: dbProduct.images,
+    price: dbProduct.discountPrice ? Number(dbProduct.discountPrice) : Number(dbProduct.price),
+    originalPrice: Number(dbProduct.price),
+    rating: catSlug === "coconut" ? 4.8 : 4.9,
+    reviews: catSlug === "coconut" ? 189 : catSlug === "sesame" ? 156 : 234,
+    badge: dbProduct.isFeatured ? "Bestseller" : undefined,
+    sizes,
+    category: dbProduct.category.name,
+    benefits,
+    specifications: specs,
+    usage,
+  };
+}
+
+export async function generateStaticParams() {
+  const dbProducts = await prisma.product.findMany({
+    select: { slug: true },
+  });
+
   return [
-    ...Object.keys(products).map((slug) => ({ slug })),
+    ...dbProducts.map((p) => ({ slug: p.slug })),
     ...Object.keys(slugRedirects).map((slug) => ({ slug })),
   ];
 }
@@ -189,8 +156,7 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const resolvedSlug = slugRedirects[slug] || slug;
-  const product = products[resolvedSlug];
+  const product = await getProductBySlug(slug);
 
   if (!product) {
     return { title: "Product Not Found" };
@@ -215,8 +181,7 @@ export default async function ProductPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const resolvedSlug = slugRedirects[slug] || slug;
-  const product = products[resolvedSlug];
+  const product = await getProductBySlug(slug);
 
   if (!product) {
     return (
@@ -237,8 +202,38 @@ export default async function ProductPage({
     );
   }
 
-  /* Related products */
-  const related = Object.values(products).filter((p) => p.slug !== product.slug);
+  // Related products (all other main categories of oils)
+  const dbRelated = await prisma.product.findMany({
+    where: {
+      slug: {
+        in: ["groundnut-oil", "coconut-oil", "sesame-oil"],
+        not: product.slug,
+      },
+    },
+    include: { category: true },
+  });
+
+  const related = dbRelated.map((p) => ({
+    name: p.name,
+    slug: p.slug,
+    tagline: p.slug.includes("coconut")
+      ? "Nature's Purest Gift"
+      : p.slug.includes("sesame")
+      ? "The Heart of Tamil Cuisine"
+      : "The Heart of South Indian Cooking",
+    description: p.description,
+    images: p.images,
+    price: p.discountPrice ? Number(p.discountPrice) : Number(p.price),
+    originalPrice: Number(p.price),
+    rating: p.slug.includes("coconut") ? 4.8 : 4.9,
+    reviews: p.slug.includes("coconut") ? 189 : p.slug.includes("sesame") ? 156 : 234,
+    badge: p.isFeatured ? "Bestseller" : undefined,
+    sizes: [
+      { label: "500ml", price: p.slug.includes("coconut") ? 229 : p.slug.includes("sesame") ? 209 : 199, originalPrice: p.slug.includes("coconut") ? 299 : p.slug.includes("sesame") ? 269 : 259 },
+      { label: "1 Ltr", price: p.discountPrice ? Number(p.discountPrice) : Number(p.price), originalPrice: Number(p.price) },
+    ],
+    category: p.category.name,
+  }));
 
   /* JSON-LD */
   const jsonLd = {
@@ -271,7 +266,7 @@ export default async function ProductPage({
       <AnnouncementBar />
       <Navbar />
       <main id="main-content">
-        <ProductDetail product={product} related={related} />
+        <ProductDetail product={product} related={related as any} />
       </main>
       <Footer />
     </>

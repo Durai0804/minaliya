@@ -22,7 +22,7 @@ const contactInfo = [
   {
     icon: <MapPin size={22} />,
     title: "Visit Us",
-    lines: ["Chennai, Tamil Nadu", "India 600001"],
+    lines: ["Shop No. 3, Kodambakkam Road, West Mambalam,", "Chennai, Tamil Nadu - 600033"],
   },
   {
     icon: <Phone size={22} />,
@@ -152,29 +152,23 @@ export default function ContactPage() {
                   Chat on WhatsApp
                 </a>
 
-                {/* Map placeholder */}
+                {/* Live Google Map Embed */}
                 <div
-                  className="rounded-2xl overflow-hidden h-48"
+                  className="rounded-2xl overflow-hidden h-64 shadow-soft transition-all duration-300 hover:shadow-md"
                   style={{
-                    background: "var(--color-cream-100)",
                     border: "1px solid var(--color-stone-200)",
                   }}
                 >
-                  <div className="w-full h-full flex items-center justify-center">
-                    <div className="text-center">
-                      <MapPin
-                        size={32}
-                        style={{ color: "var(--color-stone-300)" }}
-                        className="mx-auto mb-2"
-                      />
-                      <p
-                        className="text-sm font-medium"
-                        style={{ color: "var(--color-stone-400)" }}
-                      >
-                        Chennai, Tamil Nadu
-                      </p>
-                    </div>
-                  </div>
+                  <iframe
+                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3886.9942630650953!2d80.21720617596043!3d13.028396790938479!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3a5267bd843cc565%3A0xc6643dfa200839ed!2sMinaliya%20Wooden%20Cold%20Pressed%20Oils%20-%20Best%20Marachekku%20Oil%20Manufacturer%20in%20Chennai!5e0!3m2!1sen!2sin!4v1716142055610!5m2!1sen!2sin"
+                    width="100%"
+                    height="100%"
+                    style={{ border: 0 }}
+                    allowFullScreen={true}
+                    loading="lazy"
+                    referrerPolicy="no-referrer-when-downgrade"
+                    title="Minaliya Wooden Cold Pressed Oils Shop Location"
+                  ></iframe>
                 </div>
               </div>
 

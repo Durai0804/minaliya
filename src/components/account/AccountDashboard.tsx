@@ -1,10 +1,11 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { User, Package, MapPin, LogOut, Settings, CreditCard, ChevronRight, Edit, Trash2, Check, AlertCircle, RefreshCw } from "lucide-react";
+import { User, Package, MapPin, LogOut, Settings, CreditCard, ChevronRight, Edit, Trash2, Check, AlertCircle, RefreshCw, Sparkles, Building, Phone } from "lucide-react";
 import Link from "next/link";
 import { useOrders } from "@/context/OrderContext";
 import { useAuth } from "@/context/AuthContext";
+import { getUserOrders } from "@/actions/order";
 
 type Tab = "profile" | "orders" | "addresses" | "payment" | "settings" | "edit-profile" | "edit-address" | "add-payment";
 
@@ -19,14 +20,34 @@ interface PaymentMethod {
   isDefault: boolean;
 }
 
+interface BulkInquiry {
+  id: string;
+  name: string;
+  company?: string;
+  email: string;
+  phone: string;
+  product: string;
+  quantity: string;
+  message?: string;
+  date: string;
+}
+
 export default function AccountDashboard() {
   const [activeTab, setActiveTab] = useState<Tab>("profile");
-  const { orders } = useOrders();
+  const [ordersSubTab, setOrdersSubTab] = useState<"standard" | "bulk">("standard");
+  const { orders: localOrders } = useOrders();
   const { user, logout, updateUser } = useAuth();
+
+  // Dynamic db orders state
+  const [displayOrders, setDisplayOrders] = useState<any[]>([]);
+  const [isOrdersLoading, setIsOrdersLoading] = useState(false);
 
   // Saved Payment Methods State
   const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>([]);
   const [isLoaded, setIsLoaded] = useState(false);
+
+  // Bulk Inquiries State
+  const [bulkInquiries, setBulkInquiries] = useState<BulkInquiry[]>([]);
 
   // Form State
   const [paymentType, setPaymentType] = useState<"card" | "upi">("card");
@@ -50,6 +71,33 @@ export default function AccountDashboard() {
     }
   }, [user, activeTab]);
 
+  // Fetch dynamically live orders from Neon and combine with local storage ones
+  useEffect(() => {
+    async function fetchDbOrders() {
+      if (!user) {
+        setDisplayOrders(localOrders);
+        return;
+      }
+      setIsOrdersLoading(true);
+      const res = await getUserOrders(user.email, user.mobile);
+      if (res.success && res.orders) {
+        // Combine DB orders & local storage orders, de-duplicating by order ID
+        const combined = [...res.orders];
+        const dbOrderIds = new Set(res.orders.map((o) => o.id));
+        for (const localOrder of localOrders) {
+          if (!dbOrderIds.has(localOrder.id)) {
+            combined.push(localOrder);
+          }
+        }
+        setDisplayOrders(combined);
+      } else {
+        setDisplayOrders(localOrders);
+      }
+      setIsOrdersLoading(false);
+    }
+    fetchDbOrders();
+  }, [user, localOrders, activeTab]);
+
   useEffect(() => {
     const stored = localStorage.getItem("minaliya-payment-methods");
     if (stored) {
@@ -59,8 +107,19 @@ export default function AccountDashboard() {
         console.error("Failed to parse payment methods:", e);
       }
     }
+
+    // Load bulk inquiries from local storage
+    const storedInquiries = localStorage.getItem("minaliya-bulk-inquiries");
+    if (storedInquiries) {
+      try {
+        setBulkInquiries(JSON.parse(storedInquiries));
+      } catch (e) {
+        console.error("Failed to parse bulk inquiries:", e);
+      }
+    }
+
     setIsLoaded(true);
-  }, []);
+  }, [activeTab]);
 
   const savePaymentMethods = (methods: PaymentMethod[]) => {
     setPaymentMethods(methods);
@@ -181,11 +240,10 @@ export default function AccountDashboard() {
     return (
       <button
         onClick={() => setActiveTab(tab)}
-        className={`flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors w-full text-left ${
-          isActive
+        className={`flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors w-full text-left ${isActive
             ? "bg-[var(--color-forest-50)] text-[var(--color-forest-700)]"
             : "hover:bg-stone-50 text-[var(--color-stone-700)]"
-        }`}
+          }`}
       >
         {icon}
         {label}
@@ -207,7 +265,7 @@ export default function AccountDashboard() {
           {renderTabButton("payment", <CreditCard size={18} />, "Payment Methods")}
           {renderTabButton("settings", <Settings size={18} />, "Account Settings")}
           <div className="h-px w-full my-2" style={{ background: "var(--color-stone-200)" }}></div>
-          <button 
+          <button
             onClick={logout}
             className="flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors hover:bg-red-50 text-red-600 text-left w-full"
           >
@@ -321,7 +379,12 @@ export default function AccountDashboard() {
                 className="rounded-2xl border overflow-hidden"
                 style={{ background: "white", borderColor: "var(--color-stone-200)" }}
               >
-                {orders.length === 0 ? (
+                {isOrdersLoading ? (
+                  <div className="p-8 text-center">
+                    <RefreshCw size={28} className="animate-spin text-forest-600 mx-auto mb-2" />
+                    <p className="text-sm text-stone-500">Loading your live orders...</p>
+                  </div>
+                ) : displayOrders.length === 0 ? (
                   <div className="p-8 text-center">
                     <div
                       className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4"
@@ -341,7 +404,7 @@ export default function AccountDashboard() {
                   </div>
                 ) : (
                   <div className="divide-y" style={{ borderColor: "var(--color-stone-200)" }}>
-                    {orders.slice(0, 3).map((order) => (
+                    {displayOrders.slice(0, 3).map((order: any) => (
                       <div key={order.id} className="p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 hover:bg-stone-50 transition-colors">
                         <div>
                           <div className="flex items-center gap-3 mb-1">
@@ -413,67 +476,183 @@ export default function AccountDashboard() {
 
         {activeTab === "orders" && (
           <section className="p-8 rounded-2xl border" style={{ background: "white", borderColor: "var(--color-stone-200)" }}>
-            <h3 className="text-2xl font-bold mb-6" style={{ fontFamily: "var(--font-heading)", color: "var(--color-stone-900)" }}>
-              Order History
-            </h3>
-            {orders.length === 0 ? (
+            <div className="flex items-center justify-between mb-2">
+              <h3 className="text-2xl font-bold font-heading text-stone-900">
+                Order History
+              </h3>
+            </div>
+
+            {/* Segmented Controls */}
+            <div className="flex border-b border-stone-200 mb-6 font-sans">
+              <button
+                onClick={() => setOrdersSubTab("standard")}
+                className={`py-3 px-6 font-semibold text-sm border-b-2 transition-all flex items-center gap-2 cursor-pointer ${ordersSubTab === "standard"
+                    ? "border-forest-600 text-forest-700"
+                    : "border-transparent text-stone-500 hover:text-stone-700"
+                  }`}
+              >
+                Standard Orders
+                <span className="px-2 py-0.5 rounded-full text-xs font-bold bg-stone-100 text-stone-600">
+                  {displayOrders.length}
+                </span>
+              </button>
+              <button
+                onClick={() => setOrdersSubTab("bulk")}
+                className={`py-3 px-6 font-semibold text-sm border-b-2 transition-all flex items-center gap-2 cursor-pointer ${ordersSubTab === "bulk"
+                    ? "border-forest-600 text-forest-700"
+                    : "border-transparent text-stone-500 hover:text-stone-700"
+                  }`}
+              >
+                Wholesale Inquiries
+                <span className={`px-2 py-0.5 rounded-full text-xs font-bold ${bulkInquiries.length > 0 ? "bg-amber-100 text-amber-800" : "bg-stone-100 text-stone-600"
+                  }`}>
+                  {bulkInquiries.length}
+                </span>
+              </button>
+            </div>
+
+            {isOrdersLoading ? (
               <div className="text-center py-12">
-                <div
-                  className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4"
-                  style={{ background: "var(--color-cream-100)", color: "var(--color-stone-400)" }}
-                >
-                  <Package size={28} />
-                </div>
-                <h4 className="text-lg font-bold mb-2" style={{ color: "var(--color-stone-800)" }}>
-                  No orders yet
-                </h4>
-                <p className="text-sm mb-6 max-w-sm mx-auto" style={{ color: "var(--color-stone-500)" }}>
-                  You haven't placed any orders. Discover our cold-pressed oils.
-                </p>
-                <Link href="/shop" className="btn-primary text-sm py-2.5">
-                  Explore Shop
-                </Link>
+                <RefreshCw size={28} className="animate-spin text-forest-600 mx-auto mb-2" />
+                <p className="text-sm text-stone-500">Loading your live orders...</p>
               </div>
-            ) : (
-              <div className="space-y-6">
-                {orders.map((order) => (
-                  <div key={order.id} className="rounded-xl border overflow-hidden" style={{ background: "var(--color-cream-50)", borderColor: "var(--color-stone-200)" }}>
-                    <div className="p-5 border-b flex flex-col sm:flex-row justify-between sm:items-center gap-4" style={{ borderColor: "var(--color-stone-200)", background: "white" }}>
-                      <div className="flex gap-8">
-                        <div>
-                          <p className="text-xs text-stone-500 mb-0.5 uppercase tracking-wider font-bold">Order Placed</p>
-                          <p className="text-sm font-medium text-stone-900">{new Date(order.date).toLocaleDateString()}</p>
-                        </div>
-                        <div>
-                          <p className="text-xs text-stone-500 mb-0.5 uppercase tracking-wider font-bold">Total Amount</p>
-                          <p className="text-sm font-medium text-stone-900">₹{order.totalPrice}</p>
-                        </div>
-                      </div>
-                      <div className="flex flex-col sm:items-end">
-                        <p className="text-sm text-stone-500 mb-0.5">Order # <span className="font-medium text-stone-900">{order.id}</span></p>
-                        <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider mt-1 inline-block" style={{ background: "var(--color-amber-100)", color: "var(--color-amber-700)" }}>{order.status}</span>
-                      </div>
-                    </div>
-                    <div className="p-5 space-y-4">
-                      {order.items.map((item, i) => (
-                        <div key={i} className="flex gap-4">
-                          <div className="w-20 h-20 rounded-lg bg-white border flex items-center justify-center shrink-0 p-2" style={{ borderColor: "var(--color-stone-200)" }}>
-                            <img src={item.image} alt={item.name} className="w-full h-full object-contain" />
+            ) : ordersSubTab === "standard" ? (
+              displayOrders.length === 0 ? (
+                <div className="text-center py-12">
+                  <div
+                    className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4"
+                    style={{ background: "var(--color-cream-100)", color: "var(--color-stone-400)" }}
+                  >
+                    <Package size={28} />
+                  </div>
+                  <h4 className="text-lg font-bold mb-2" style={{ color: "var(--color-stone-800)" }}>
+                    No orders yet
+                  </h4>
+                  <p className="text-sm mb-6 max-w-sm mx-auto" style={{ color: "var(--color-stone-500)" }}>
+                    You haven't placed any orders. Discover our cold-pressed oils.
+                  </p>
+                  <Link href="/shop" className="btn-primary text-sm py-2.5">
+                    Explore Shop
+                  </Link>
+                </div>
+              ) : (
+                <div className="space-y-6">
+                  {displayOrders.map((order: any) => (
+                    <div key={order.id} className="rounded-xl border overflow-hidden" style={{ background: "var(--color-cream-50)", borderColor: "var(--color-stone-200)" }}>
+                      <div className="p-5 border-b flex flex-col sm:flex-row justify-between sm:items-center gap-4" style={{ borderColor: "var(--color-stone-200)", background: "white" }}>
+                        <div className="flex gap-8">
+                          <div>
+                            <p className="text-xs text-stone-500 mb-0.5 uppercase tracking-wider font-bold">Order Placed</p>
+                            <p className="text-sm font-medium text-stone-900">{new Date(order.date).toLocaleDateString()}</p>
                           </div>
-                          <div className="flex-1 flex flex-col justify-center">
-                            <p className="font-bold text-stone-900 text-sm">{item.name}</p>
-                            <p className="text-xs text-stone-500 mt-1">Size: {item.size}</p>
-                            <div className="flex justify-between items-center mt-2">
-                              <p className="text-xs font-medium text-stone-600">Qty: {item.quantity}</p>
-                              <p className="font-bold text-stone-900 text-sm">₹{item.price * item.quantity}</p>
+                          <div>
+                            <p className="text-xs text-stone-500 mb-0.5 uppercase tracking-wider font-bold">Total Amount</p>
+                            <p className="text-sm font-medium text-stone-900">₹{order.totalPrice}</p>
+                          </div>
+                        </div>
+                        <div className="flex flex-col sm:items-end">
+                          <p className="text-sm text-stone-500 mb-0.5">Order # <span className="font-medium text-stone-900">{order.id}</span></p>
+                          <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider mt-1 inline-block" style={{ background: "var(--color-amber-100)", color: "var(--color-amber-700)" }}>{order.status}</span>
+                        </div>
+                      </div>
+                      <div className="p-5 space-y-4">
+                        {order.items.map((item: any, i: number) => (
+                          <div key={i} className="flex gap-4">
+                            <div className="w-20 h-20 rounded-lg bg-white border flex items-center justify-center shrink-0 p-2" style={{ borderColor: "var(--color-stone-200)" }}>
+                              <img src={item.image} alt={item.name} className="w-full h-full object-contain" />
+                            </div>
+                            <div className="flex-1 flex flex-col justify-center">
+                              <p className="font-bold text-stone-900 text-sm">{item.name}</p>
+                              <p className="text-xs text-stone-500 mt-1">Size: {item.size}</p>
+                              <div className="flex justify-between items-center mt-2">
+                                <p className="text-xs font-medium text-stone-600">Qty: {item.quantity}</p>
+                                <p className="font-bold text-stone-900 text-sm">₹{item.price * item.quantity}</p>
+                              </div>
                             </div>
                           </div>
-                        </div>
-                      ))}
+                        ))}
+                      </div>
                     </div>
+                  ))}
+                </div>
+              )
+            ) : (
+              bulkInquiries.length === 0 ? (
+                <div className="text-center py-12 font-sans">
+                  <div
+                    className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4"
+                    style={{ background: "var(--color-cream-100)", color: "var(--color-stone-400)" }}
+                  >
+                    <Sparkles size={28} className="text-stone-500" />
                   </div>
-                ))}
-              </div>
+                  <h4 className="text-lg font-bold mb-2 text-stone-850">
+                    No bulk inquiries yet
+                  </h4>
+                  <p className="text-sm mb-6 max-w-sm mx-auto text-stone-500">
+                    Need high-volume wood pressed oil for your business? Submit a wholesale inquiry on the shop page!
+                  </p>
+                  <Link href="/shop" className="btn-primary text-sm py-2.5">
+                    Explore Shop
+                  </Link>
+                </div>
+              ) : (
+                <div className="space-y-6">
+                  {bulkInquiries.map((inquiry) => (
+                    <div
+                      key={inquiry.id}
+                      className="rounded-xl border overflow-hidden transition-all duration-300 hover:shadow-soft"
+                      style={{ background: "var(--color-cream-50)", borderColor: "var(--color-stone-200)" }}
+                    >
+                      <div className="p-5 border-b flex flex-col sm:flex-row justify-between sm:items-center gap-4" style={{ borderColor: "var(--color-stone-200)", background: "white" }}>
+                        <div className="flex gap-8">
+                          <div>
+                            <p className="text-xs text-stone-500 mb-0.5 uppercase tracking-wider font-bold">Inquiry Sent</p>
+                            <p className="text-sm font-medium text-stone-900">{new Date(inquiry.date).toLocaleDateString()}</p>
+                          </div>
+                          <div>
+                            <p className="text-xs text-stone-500 mb-0.5 uppercase tracking-wider font-bold">Est. Volume</p>
+                            <p className="text-sm font-bold text-forest-700">{inquiry.quantity} Litres</p>
+                          </div>
+                        </div>
+                        <div className="flex flex-col sm:items-end">
+                          <p className="text-sm text-stone-500 mb-0.5 font-sans">Ref # <span className="font-mono font-bold text-stone-900">{inquiry.id}</span></p>
+                          <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider mt-1 inline-block" style={{ background: "var(--color-amber-100)", color: "var(--color-amber-700)" }}>
+                            Under B2B Review
+                          </span>
+                        </div>
+                      </div>
+                      <div className="p-6 space-y-4 font-sans">
+                        <div className="flex flex-col sm:flex-row gap-6 justify-between items-start sm:items-center">
+                          <div className="space-y-1">
+                            <p className="text-xs text-stone-400 font-bold uppercase tracking-wider">Product of Interest</p>
+                            <h4 className="font-bold text-stone-900 text-base">{inquiry.product}</h4>
+                            {inquiry.company && (
+                              <p className="text-xs text-stone-600 flex items-center gap-1.5 mt-1 font-medium">
+                                <Building size={12} className="text-stone-400" /> {inquiry.company}
+                              </p>
+                            )}
+                          </div>
+                          <div className="w-full sm:w-auto">
+                            <a
+                              href={`https://wa.me/919876543210?text=Hi%20Minaliya,%20I%20would%20like%20to%20follow%20up%20on%20my%20wholesale%20bulk%20inquiry%20reference%20ID%20${inquiry.id}.`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="btn-primary py-2 px-5 text-xs font-semibold rounded-full bg-green-600 hover:bg-green-700 text-white border-transparent flex items-center justify-center gap-1.5 cursor-pointer font-sans"
+                            >
+                              <Phone size={12} /> Chat with Manager
+                            </a>
+                          </div>
+                        </div>
+                        {inquiry.message && (
+                          <div className="p-4 rounded-lg bg-white border border-stone-100 text-sm text-stone-600 italic">
+                            &ldquo;{inquiry.message}&rdquo;
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )
             )}
           </section>
         )}
@@ -486,7 +665,7 @@ export default function AccountDashboard() {
               </h3>
               <button className="btn-primary text-sm py-2 px-4">Add New Address</button>
             </div>
-            
+
             <div className="space-y-4">
               <div className="p-6 rounded-xl border flex flex-col sm:flex-row gap-6 justify-between items-start" style={{ background: "var(--color-cream-50)", borderColor: "var(--color-forest-200)" }}>
                 <div className="flex gap-4">
@@ -507,7 +686,7 @@ export default function AccountDashboard() {
                   </div>
                 </div>
                 <div className="flex gap-2 w-full sm:w-auto">
-                  <button 
+                  <button
                     onClick={() => setActiveTab("edit-address")}
                     className="btn-secondary text-sm py-1.5 px-4 rounded-full flex-1 sm:flex-none"
                   >
@@ -579,7 +758,7 @@ export default function AccountDashboard() {
                         >
                           {method.type === "card" ? `${method.cardType} card` : "UPI ID"}
                         </span>
-                        
+
                         {method.isDefault && (
                           <span
                             className="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider flex items-center gap-1"
@@ -674,22 +853,20 @@ export default function AccountDashboard() {
                   <button
                     type="button"
                     onClick={() => { setPaymentType("card"); setFormError(""); }}
-                    className={`py-2.5 rounded-lg text-sm font-semibold transition-all cursor-pointer ${
-                      paymentType === "card"
+                    className={`py-2.5 rounded-lg text-sm font-semibold transition-all cursor-pointer ${paymentType === "card"
                         ? "bg-white shadow-soft text-forest-700 border border-stone-200/30"
                         : "text-stone-500 hover:text-stone-700"
-                    }`}
+                      }`}
                   >
                     Credit / Debit Card
                   </button>
                   <button
                     type="button"
                     onClick={() => { setPaymentType("upi"); setFormError(""); }}
-                    className={`py-2.5 rounded-lg text-sm font-semibold transition-all cursor-pointer ${
-                      paymentType === "upi"
+                    className={`py-2.5 rounded-lg text-sm font-semibold transition-all cursor-pointer ${paymentType === "upi"
                         ? "bg-white shadow-soft text-forest-700 border border-stone-200/30"
                         : "text-stone-500 hover:text-stone-700"
-                    }`}
+                      }`}
                   >
                     UPI ID
                   </button>
@@ -828,23 +1005,23 @@ export default function AccountDashboard() {
               </h3>
               <button onClick={() => setActiveTab("addresses")} className="text-sm font-medium hover:underline" style={{ color: "var(--color-stone-500)" }}>Cancel</button>
             </div>
-            
+
             <form className="space-y-5 max-w-lg" onSubmit={(e) => { e.preventDefault(); setActiveTab("addresses"); }}>
               <div>
                 <label className="block text-sm font-medium mb-1" style={{ color: "var(--color-stone-700)" }}>Full Name</label>
                 <input type="text" defaultValue="Guest User" className="w-full px-4 py-2.5 rounded-lg border focus:ring-2 outline-none" style={{ background: "var(--color-cream-50)", borderColor: "var(--color-stone-200)" }} required />
               </div>
-              
+
               <div>
                 <label className="block text-sm font-medium mb-1" style={{ color: "var(--color-stone-700)" }}>Address Line 1</label>
                 <input type="text" defaultValue="123 Artisanal Way, Suite 4B" className="w-full px-4 py-2.5 rounded-lg border focus:ring-2 outline-none" style={{ background: "var(--color-cream-50)", borderColor: "var(--color-stone-200)" }} required />
               </div>
-              
+
               <div>
                 <label className="block text-sm font-medium mb-1" style={{ color: "var(--color-stone-700)" }}>Address Line 2 (Optional)</label>
                 <input type="text" className="w-full px-4 py-2.5 rounded-lg border focus:ring-2 outline-none" style={{ background: "var(--color-cream-50)", borderColor: "var(--color-stone-200)" }} />
               </div>
-              
+
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium mb-1" style={{ color: "var(--color-stone-700)" }}>City</label>
@@ -855,7 +1032,7 @@ export default function AccountDashboard() {
                   <input type="text" defaultValue="Maharashtra" className="w-full px-4 py-2.5 rounded-lg border focus:ring-2 outline-none" style={{ background: "var(--color-cream-50)", borderColor: "var(--color-stone-200)" }} required />
                 </div>
               </div>
-              
+
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium mb-1" style={{ color: "var(--color-stone-700)" }}>ZIP Code</label>
@@ -866,7 +1043,7 @@ export default function AccountDashboard() {
                   <input type="tel" defaultValue="+91 98765 43210" className="w-full px-4 py-2.5 rounded-lg border focus:ring-2 outline-none" style={{ background: "var(--color-cream-50)", borderColor: "var(--color-stone-200)" }} required />
                 </div>
               </div>
-              
+
               <div className="pt-4 flex gap-4">
                 <button type="submit" className="btn-primary text-sm py-2.5 px-6">Save Address</button>
               </div>
@@ -882,7 +1059,7 @@ export default function AccountDashboard() {
               </h3>
               <button onClick={() => setActiveTab("profile")} className="text-sm font-medium hover:underline text-stone-500 cursor-pointer">Cancel</button>
             </div>
-            
+
             <form className="space-y-5 max-w-lg" onSubmit={handleSaveProfile}>
               <div className="flex items-center gap-6 mb-6">
                 <div className="w-20 h-20 rounded-full flex items-center justify-center text-2xl font-bold border-4" style={{ background: "var(--color-amber-100)", color: "var(--color-amber-700)", borderColor: "white", boxShadow: "var(--shadow-soft)" }}>
@@ -890,7 +1067,7 @@ export default function AccountDashboard() {
                 </div>
                 <button type="button" className="btn-secondary text-sm py-2 px-4 cursor-pointer">Change Photo</button>
               </div>
-              
+
               <div>
                 <label className="block text-sm font-semibold mb-1 text-stone-700">Full Name</label>
                 <input
@@ -902,7 +1079,7 @@ export default function AccountDashboard() {
                   required
                 />
               </div>
-              
+
               <div>
                 <label className="block text-sm font-semibold mb-1 text-stone-700">Email Address</label>
                 <input
@@ -914,7 +1091,7 @@ export default function AccountDashboard() {
                   required
                 />
               </div>
-              
+
               <div>
                 <label className="block text-sm font-semibold mb-1 text-stone-700">Phone Number (10 digits)</label>
                 <input
@@ -927,7 +1104,7 @@ export default function AccountDashboard() {
                   required
                 />
               </div>
-              
+
               <div className="pt-4">
                 <button type="submit" className="btn-primary text-sm py-2.5 px-6 cursor-pointer">
                   Save Changes

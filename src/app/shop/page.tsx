@@ -3,6 +3,7 @@ import AnnouncementBar from "@/components/layout/AnnouncementBar";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import ShopContent from "@/components/shop/ShopContent";
+import prisma from "@/lib/prisma";
 
 export const metadata: Metadata = {
   title: "Shop Pure Cold Pressed Oils",
@@ -19,7 +20,47 @@ export const metadata: Metadata = {
   },
 };
 
-export default function ShopPage() {
+export default async function ShopPage() {
+  // Fetch live products from Neon via Prisma
+  const dbProducts = await prisma.product.findMany({
+    include: {
+      category: true,
+    },
+    orderBy: {
+      createdAt: "asc",
+    },
+  });
+
+  // Map database entries to match the frontend Product interface structure
+  const products = dbProducts.map((p) => {
+    // Standardized ratings & reviews count for visual premium experience
+    let rating = 4.9;
+    let reviews = 234;
+
+    if (p.slug.includes("coconut")) {
+      rating = 4.8;
+      reviews = 189;
+    } else if (p.slug.includes("sesame")) {
+      rating = 4.9;
+      reviews = 156;
+    }
+
+    return {
+      id: p.id,
+      name: p.name,
+      slug: p.slug,
+      image: p.images[0] || "/products/placeholder.jpg",
+      price: p.discountPrice ? Number(p.discountPrice) : Number(p.price),
+      originalPrice: Number(p.price),
+      rating,
+      reviews,
+      badge: p.isFeatured ? "Bestseller" : undefined,
+      sizes: p.slug.includes("500ml") ? ["500ml"] : ["1 Ltr"],
+      category: p.category.name,
+      description: p.description,
+    };
+  });
+
   return (
     <>
       <AnnouncementBar />
@@ -67,10 +108,11 @@ export default function ShopPage() {
           </div>
         </section>
 
-        <ShopContent />
+        <ShopContent initialProducts={products} />
       </main>
 
       <Footer />
     </>
   );
 }
+

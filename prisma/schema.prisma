@@ -85,3 +85,15 @@ model OrderItem {
   quantity  Int
   price     Decimal @db.Decimal(10, 2)
 }
+
+model BulkInquiry {
+  id        String   @id @default(cuid())
+  name      String
+  company   String?
+  email     String
+  phone     String
+  product   String
+  quantity  Int
+  message   String?
+  createdAt DateTime @default(now())
+}

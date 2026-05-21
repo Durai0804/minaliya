@@ -12,6 +12,7 @@ import {
 
 const quickLinks = [
   { name: "Shop All Oils", href: "/shop" },
+  { name: "Subscription", href: "/subscription" },
   { name: "About Minaliya", href: "/about" },
   { name: "Our Process", href: "/about#process" },
   { name: "Health Benefits", href: "/benefits" },
@@ -111,7 +112,7 @@ export default function Footer() {
             <div className="space-y-3 text-sm" style={{ color: "var(--color-stone-400)" }}>
               <div className="flex items-start gap-2.5">
                 <MapPin size={16} className="shrink-0 mt-0.5" />
-                <span>Chennai, Tamil Nadu, India 600001</span>
+                <span>Shop No. 3, Kodambakkam Road, West Mambalam, Chennai - 600033</span>
               </div>
               <div className="flex items-center gap-2.5">
                 <Phone size={16} className="shrink-0" />

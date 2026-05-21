@@ -181,7 +181,7 @@ function MessageBubble({ message, onChipClick }: MessageBubbleProps) {
 // ---------------------------------------------------------------------------
 export default function ChatBot() {
   const pathname = usePathname();
-  if (pathname === "/chat") return null;
+  if (pathname === "/chat" || pathname.startsWith("/admin")) return null;
 
   const { user } = useAuth();
 
