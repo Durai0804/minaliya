@@ -24,7 +24,7 @@ export async function getAdminDashboardStats() {
     ]);
 
   const totalRevenue = orders.reduce(
-    (sum, order) => sum + Number(order.totalAmount),
+    (sum: number, order) => sum + Number(order.totalAmount),
     0
   );
   const pendingOrders = orders.filter(
@@ -170,6 +170,6 @@ export async function getRecentOrders(limit = 10) {
     paymentStatus: order.paymentStatus,
     customerName: (order.shippingAddress as Record<string, string>)?.name || "N/A",
     createdAt: order.createdAt.toISOString(),
-    itemCount: order.items.reduce((sum, item) => sum + item.quantity, 0),
+    itemCount: order.items.reduce((sum: number, item) => sum + item.quantity, 0),
   }));
 }
