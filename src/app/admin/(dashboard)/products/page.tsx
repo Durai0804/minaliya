@@ -1,11 +1,15 @@
-import { getAllProducts } from "@/actions/adminData";
-import { Leaf, AlertTriangle, CheckCircle, HelpCircle } from "lucide-react";
+import { getAllProducts, getAllCategories } from "@/actions/adminData";
+import AddProductModal from "@/components/admin/AddProductModal";
+import { AlertTriangle, CheckCircle } from "lucide-react";
 import Image from "next/image";
 
 export const revalidate = 0; // Disable static rendering for admin data pages
 
 export default async function AdminProductsPage() {
-  const products = await getAllProducts();
+  const [products, categories] = await Promise.all([
+    getAllProducts(),
+    getAllCategories(),
+  ]);
 
   const getStockStatus = (stock: number) => {
     if (stock === 0) {
@@ -47,8 +51,11 @@ export default async function AdminProductsPage() {
             Check active oil variants in database records, monitor remaining quantities, and review prices.
           </p>
         </div>
-        <div className="px-3 py-1 text-xs font-semibold rounded-full bg-forest-50 text-forest-700 border border-forest-200 shadow-sm">
-          {products.length} Products Defined
+        <div className="flex items-center gap-3">
+          <div className="px-3 py-1 text-xs font-semibold rounded-full bg-forest-50 text-forest-700 border border-forest-200 shadow-sm">
+            {products.length} Products Defined
+          </div>
+          <AddProductModal categories={categories} />
         </div>
       </div>
 
@@ -98,6 +105,7 @@ export default async function AdminProductsPage() {
                               src={product.images[0] || "/products/placeholder.jpg"}
                               alt={product.name}
                               fill
+                              sizes="48px"
                               className="object-contain p-1"
                             />
                           </div>
@@ -143,8 +151,12 @@ export default async function AdminProductsPage() {
               </tbody>
             </table>
           ) : (
-            <div className="p-12 text-center text-stone-500 font-medium">
-              No products found in the database. Add them in Prisma to track inventory.
+            <div className="p-12 text-center text-stone-500 font-medium space-y-3">
+              <p>No products yet.</p>
+              <p className="text-sm text-stone-400">
+                Use <strong className="text-stone-600">Add Product</strong> above to
+                create your first listing—it will appear on the shop automatically.
+              </p>
             </div>
           )}
         </div>

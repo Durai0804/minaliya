@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { X, Phone, User, CheckCircle2, MessageSquare, Mail, ShieldCheck } from "lucide-react";
+import { X, Phone, User, CheckCircle2, MessageSquare, Mail } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { sendOtpAction, verifyOtpAction } from "@/actions/auth";
 import { adminLogin } from "@/actions/admin";
@@ -16,8 +16,8 @@ export default function LoginModal() {
   const [otpToken, setOtpToken] = useState("");
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [isAdminUser, setIsAdminUser] = useState(false);
   const [isReturningUser, setIsReturningUser] = useState(false);
+  const [isRedirectingToAdmin, setIsRedirectingToAdmin] = useState(false);
 
   if (!isLoginModalOpen) return null;
 
@@ -47,11 +47,21 @@ export default function LoginModal() {
       const isAdmin = lookupData.isAdmin;
       const existingName = lookupData.user?.name || "";
 
-      setIsReturningUser(lookupData.exists === true);
+      setIsReturningUser(lookupData.exists === true && !isAdmin);
+
+      // Admin: skip OTP and go straight to dashboard
       if (isAdmin) {
-        setIsAdminUser(true);
-      } else {
-        setIsAdminUser(false);
+        setIsRedirectingToAdmin(true);
+        const adminRes = await adminLogin(email, mobile);
+        if (adminRes.success) {
+          resetForm();
+          closeLoginModal();
+          window.location.href = "/admin";
+          return;
+        }
+        setIsRedirectingToAdmin(false);
+        setError(adminRes.error || "Failed to access admin dashboard.");
+        return;
       }
 
       // 2. Trigger real WhatsApp OTP using sendOtpAction
@@ -90,20 +100,7 @@ export default function LoginModal() {
       const data = await res.json();
       setIsReturningUser(data.exists === true);
 
-      if (data.exists && data.isAdmin && otp === "123456") {
-        const adminRes = await adminLogin(email, mobile);
-        if (adminRes.success) {
-          resetForm();
-          closeLoginModal();
-          window.location.href = "/admin";
-          return;
-        } else {
-          setError(adminRes.error || "Failed admin authentication.");
-          return;
-        }
-      }
-
-      // 2. Verify OTP — only skip name step for fully registered returning users
+      // Verify OTP — only skip name step for fully registered returning users
       const response = await verifyOtpAction(mobile, otp, otpToken, email);
       if (response.success) {
         const canLoginDirectly =
@@ -180,8 +177,8 @@ export default function LoginModal() {
     setOtp("");
     setName("");
     setError("");
-    setIsAdminUser(false);
     setIsReturningUser(false);
+    setIsRedirectingToAdmin(false);
   };
 
   const getHeaderInfo = () => {
@@ -284,7 +281,11 @@ export default function LoginModal() {
                 disabled={isLoading}
                 className="w-full btn-primary py-4 justify-center text-base mt-4 shadow-lg shadow-forest-600/20 disabled:opacity-70 disabled:cursor-not-allowed"
               >
-                {isLoading ? "Sending OTP..." : "Send OTP via WhatsApp"}
+                {isLoading
+                  ? isRedirectingToAdmin
+                    ? "Redirecting to admin dashboard..."
+                    : "Sending OTP..."
+                  : "Send OTP via WhatsApp"}
               </button>
             </form>
           )}
@@ -307,25 +308,6 @@ export default function LoginModal() {
               </div>
 
               {error && <p className="text-xs font-medium text-red-500 text-center">{error}</p>}
-
-              {isAdminUser && (
-                <div 
-                  className="p-4 rounded-2xl text-left border"
-                  style={{ 
-                    background: "var(--color-cream-50)", 
-                    borderColor: "var(--color-forest-200)",
-                    color: "var(--color-stone-700)"
-                  }}
-                >
-                  <p className="font-bold mb-1 flex items-center gap-1.5 text-sm" style={{ color: "var(--color-forest-700)" }}>
-                    <ShieldCheck size={16} />
-                    Admin Credentials Detected
-                  </p>
-                  <p className="text-[11px] leading-relaxed text-stone-500">
-                    Your credentials match the Minaliya administrator profile. Please use the secure testing code <strong className="font-bold text-forest-700">123456</strong> to proceed to the admin dashboard.
-                  </p>
-                </div>
-              )}
 
               <div className="space-y-3">
                 <button 

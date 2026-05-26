@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { adminLogin } from "@/actions/admin";
 import { Lock, Mail, Phone, ShieldCheck, Loader2, Eye, EyeOff } from "lucide-react";
 
@@ -11,8 +10,6 @@ export default function AdminLoginPage() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [showPhone, setShowPhone] = useState(false);
-  const router = useRouter();
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
@@ -21,7 +18,7 @@ export default function AdminLoginPage() {
     try {
       const result = await adminLogin(email, phone);
       if (result.success) {
-        router.push("/admin");
+        window.location.href = "/admin";
       } else {
         setError(result.error || "Login failed.");
       }
@@ -96,7 +93,7 @@ export default function AdminLoginPage() {
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="admin@minaliya.in"
+                  placeholder="mailme@minaliya.in"
                   className="w-full pl-12 pr-4 py-3.5 rounded-xl text-sm outline-none transition-all duration-300"
                   style={{
                     background: "white",
@@ -134,7 +131,7 @@ export default function AdminLoginPage() {
                   type={showPhone ? "text" : "password"}
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
-                  placeholder="+91 98765 43210"
+                  placeholder="917824807770"
                   className="w-full pl-12 pr-12 py-3.5 rounded-xl text-sm outline-none transition-all duration-300"
                   style={{
                     background: "white",

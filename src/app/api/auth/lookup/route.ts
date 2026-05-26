@@ -1,6 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
-import { isCompleteReturningUser, normalizePhone } from "@/lib/auth-utils";
+import {
+  isAdminCredentialsMatch,
+  isCompleteReturningUser,
+  normalizePhone,
+} from "@/lib/auth-utils";
 
 export async function POST(request: NextRequest) {
   try {
@@ -19,13 +23,7 @@ export async function POST(request: NextRequest) {
     const adminPhone = process.env.ADMIN_PHONE;
 
     if (adminEmail && adminPhone && email && mobile) {
-      const normalizedEmail = email.trim().toLowerCase();
-      const normalizedPhone = mobile.replace(/\D/g, "").slice(-10);
-
-      const expectedEmail = adminEmail.trim().toLowerCase();
-      const expectedPhone = adminPhone.replace(/\D/g, "").slice(-10);
-
-      if (normalizedEmail === expectedEmail && normalizedPhone === expectedPhone) {
+      if (isAdminCredentialsMatch(email, mobile, adminEmail, adminPhone)) {
         return NextResponse.json({
           exists: true,
           isAdmin: true,
@@ -33,7 +31,7 @@ export async function POST(request: NextRequest) {
             id: "admin",
             name: "Administrator",
             email: adminEmail,
-            phoneNumber: adminPhone,
+            mobile: normalizePhone(adminPhone),
           },
         });
       }

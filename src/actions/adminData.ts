@@ -1,7 +1,24 @@
 "use server";
 
 import prisma from "@/lib/prisma";
+import { slugify } from "@/lib/product-utils";
 import { verifyAdminSession } from "./admin";
+
+export type CreateProductInput = {
+  name: string;
+  slug: string;
+  description: string;
+  categoryId: string;
+  price: number;
+  discountPrice?: number | null;
+  stock: number;
+  imagePath: string;
+  extraImagePaths?: string[];
+  isFeatured?: boolean;
+  extractionMethod?: string;
+  origin?: string;
+  shelfLife?: string;
+};
 
 async function requireAdmin() {
   const { isAdmin } = await verifyAdminSession();
@@ -103,6 +120,131 @@ export async function getAllProducts() {
     categoryName: product.category.name,
     createdAt: product.createdAt.toISOString(),
   }));
+}
+
+export async function getAllCategories() {
+  await requireAdmin();
+
+  const categories = await prisma.category.findMany({
+    orderBy: { name: "asc" },
+    select: { id: true, name: true, slug: true },
+  });
+
+  return categories;
+}
+
+export async function createProduct(input: CreateProductInput) {
+  await requireAdmin();
+
+  const name = input.name?.trim();
+  const slug = slugify(input.slug || input.name || "");
+  const description = input.description?.trim();
+  const categoryId = input.categoryId?.trim();
+  const imagePath = input.imagePath?.trim();
+
+  if (!name || !slug || !description || !categoryId) {
+    return {
+      success: false as const,
+      error: "Name, slug, description, and category are required.",
+    };
+  }
+
+  if (!imagePath || !imagePath.startsWith("/")) {
+    return {
+      success: false as const,
+      error: "Image path is required and must start with / (e.g. /products/your-image.jpg).",
+    };
+  }
+
+  const price = Number(input.price);
+  const stock = Number(input.stock);
+
+  if (!Number.isFinite(price) || price <= 0) {
+    return { success: false as const, error: "MRP must be a positive number." };
+  }
+
+  if (!Number.isInteger(stock) || stock < 0) {
+    return { success: false as const, error: "Stock must be a whole number of 0 or more." };
+  }
+
+  const discountPrice =
+    input.discountPrice != null ? Number(input.discountPrice) : null;
+
+  if (discountPrice != null && (!Number.isFinite(discountPrice) || discountPrice <= 0)) {
+    return { success: false as const, error: "Sale price must be a positive number." };
+  }
+
+  if (discountPrice != null && discountPrice > price) {
+    return {
+      success: false as const,
+      error: "Sale price cannot be higher than MRP.",
+    };
+  }
+
+  const category = await prisma.category.findUnique({
+    where: { id: categoryId },
+  });
+
+  if (!category) {
+    return { success: false as const, error: "Selected category does not exist." };
+  }
+
+  const existingSlug = await prisma.product.findUnique({
+    where: { slug },
+  });
+
+  if (existingSlug) {
+    return {
+      success: false as const,
+      error: `A product with slug "${slug}" already exists. Choose a different slug.`,
+    };
+  }
+
+  const extraImages = (input.extraImagePaths || [])
+    .map((p) => p.trim())
+    .filter((p) => p.startsWith("/"));
+  const images = [imagePath, ...extraImages.filter((p) => p !== imagePath)];
+
+  const specifications: Record<string, string> = {};
+  if (input.extractionMethod?.trim()) {
+    specifications["Extraction Method"] = input.extractionMethod.trim();
+  }
+  if (input.origin?.trim()) {
+    specifications["Origin"] = input.origin.trim();
+  }
+  if (input.shelfLife?.trim()) {
+    specifications["Shelf Life"] = input.shelfLife.trim();
+  }
+
+  try {
+    const product = await prisma.product.create({
+      data: {
+        name,
+        slug,
+        description,
+        categoryId,
+        price,
+        discountPrice: discountPrice ?? undefined,
+        stock,
+        images,
+        isFeatured: input.isFeatured ?? false,
+        specifications:
+          Object.keys(specifications).length > 0 ? specifications : undefined,
+      },
+    });
+
+    return { success: true as const, productId: product.id };
+  } catch (error: unknown) {
+    console.error("Error creating product:", error);
+    const prismaError = error as { code?: string };
+    if (prismaError.code === "P2002") {
+      return {
+        success: false as const,
+        error: "A product with this slug already exists.",
+      };
+    }
+    return { success: false as const, error: "Failed to create product." };
+  }
 }
 
 export async function getAllInquiries() {

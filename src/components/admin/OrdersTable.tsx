@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { Fragment, useState } from "react";
 import { updateOrderStatus } from "@/actions/adminData";
 import OrderStatusBadge from "./OrderStatusBadge";
 import { ChevronDown, ChevronUp, Eye, Phone, Mail, MapPin, CheckCircle, Loader2 } from "lucide-react";
@@ -97,10 +97,9 @@ export default function OrdersTable({ initialOrders }: OrdersTableProps) {
                 const isUpdating = updatingId === order.id;
 
                 return (
-                  <>
+                  <Fragment key={order.id}>
                     {/* Main Row */}
                     <tr
-                      key={order.id}
                       className="hover:bg-stone-50/50 text-stone-600 transition-colors border-b"
                       style={{ borderColor: "var(--color-stone-100)" }}
                     >
@@ -188,6 +187,7 @@ export default function OrdersTable({ initialOrders }: OrdersTableProps) {
                                           src={item.productImage}
                                           alt={item.productName}
                                           fill
+                                          sizes="40px"
                                           className="object-contain"
                                         />
                                       </div>
@@ -246,7 +246,7 @@ export default function OrdersTable({ initialOrders }: OrdersTableProps) {
                         </td>
                       </tr>
                     )}
-                  </>
+                  </Fragment>
                 );
               })}
             </tbody>

@@ -19,6 +19,19 @@ export function normalizeEmail(email: string): string {
   return email.trim().toLowerCase();
 }
 
+/** True when email + phone match configured admin credentials. */
+export function isAdminCredentialsMatch(
+  email: string,
+  mobile: string,
+  adminEmail: string,
+  adminPhone: string
+): boolean {
+  return (
+    normalizeEmail(email) === normalizeEmail(adminEmail) &&
+    normalizePhone(mobile) === normalizePhone(adminPhone)
+  );
+}
+
 /**
  * A returning user must have the same phone + email on file with a real name.
  * Phone-only or email-only partial matches still require the name step.
