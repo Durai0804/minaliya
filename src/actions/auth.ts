@@ -90,7 +90,7 @@ export async function sendOtpAction(name: string, mobile: string) {
       destination: destination,
       userName: name || AISENSY_USER_NAME,
       templateParams: [
-        "$FirstName"
+        `*${otp}*`
       ],
       source: "new-landing-page form",
       media: {},
