@@ -810,7 +810,7 @@ export default function AccountDashboard() {
                           </div>
                           <div className="w-full sm:w-auto">
                             <a
-                              href={`https://wa.me/919876543210?text=Hi%20Minaliya,%20I%20would%20like%20to%20follow%20up%20on%20my%20wholesale%20bulk%20inquiry%20reference%20ID%20${inquiry.id}.`}
+                              href={`https://wa.me/917824807770?text=Hi%20Minaliya,%20I%20would%20like%20to%20follow%20up%20on%20my%20wholesale%20bulk%20inquiry%20reference%20ID%20${inquiry.id}.`}
                               target="_blank"
                               rel="noopener noreferrer"
                               className="btn-primary py-2 px-5 text-xs font-semibold rounded-full bg-green-600 hover:bg-green-700 text-white border-transparent flex items-center justify-center gap-1.5 cursor-pointer font-sans"

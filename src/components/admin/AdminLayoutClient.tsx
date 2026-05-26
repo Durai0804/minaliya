@@ -25,7 +25,7 @@ export default function AdminLayoutClient({
   const title = getPageTitle(pathname);
 
   return (
-    <div className="min-h-screen text-slate-100 flex" style={{ background: "#090d16" }}>
+    <div className="min-h-screen flex" style={{ background: "var(--color-cream-50)", color: "var(--color-stone-800)" }}>
       {/* Sidebar Navigation */}
       <AdminSidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 

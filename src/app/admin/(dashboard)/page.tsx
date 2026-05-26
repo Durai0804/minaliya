@@ -34,25 +34,25 @@ export default async function AdminDashboardPage() {
       <div
         className="p-6 md:p-8 rounded-3xl border relative overflow-hidden"
         style={{
-          background: "linear-gradient(135deg, rgba(99, 102, 241, 0.15) 0%, rgba(16, 185, 129, 0.05) 100%)",
-          borderColor: "rgba(99, 102, 241, 0.15)",
+          background: "linear-gradient(135deg, var(--color-forest-50) 0%, var(--color-cream-100) 100%)",
+          borderColor: "var(--color-forest-100)",
         }}
       >
         <div className="relative z-10 max-w-2xl">
           <h2
-            className="text-2xl md:text-3xl font-bold text-white mb-2"
+            className="text-2xl md:text-3xl font-bold text-stone-900 mb-2"
             style={{ fontFamily: "var(--font-heading)" }}
           >
             Welcome Back, Admin
           </h2>
-          <p className="text-sm text-slate-400 leading-relaxed">
+          <p className="text-sm text-stone-600 leading-relaxed">
             Monitor orders, manage store products, respond to bulk purchase inquiries, and oversee storefront performance analytics.
           </p>
         </div>
         {/* Glow backdrop */}
         <div
           className="absolute -right-10 -top-10 w-40 h-40 rounded-full blur-[60px]"
-          style={{ background: "rgba(99, 102, 241, 0.15)" }}
+          style={{ background: "var(--color-forest-100)" }}
         />
       </div>
 
@@ -64,7 +64,7 @@ export default async function AdminDashboardPage() {
           icon={DollarSign}
           trend={{ value: "+12.5%", positive: true }}
           description="Total earnings from all processed orders"
-          color="emerald"
+          color="forest"
         />
         <StatCard
           title="Total Orders"
@@ -96,21 +96,22 @@ export default async function AdminDashboardPage() {
         <div
           className="lg:col-span-2 rounded-2xl border overflow-hidden"
           style={{
-            background: "rgba(30, 41, 59, 0.3)",
-            borderColor: "rgba(255, 255, 255, 0.05)",
+            background: "white",
+            borderColor: "var(--color-stone-200)",
+            boxShadow: "var(--shadow-card)",
           }}
         >
           <div
             className="flex items-center justify-between p-6 border-b"
-            style={{ borderColor: "rgba(255, 255, 255, 0.05)" }}
+            style={{ borderColor: "var(--color-stone-100)" }}
           >
             <div>
-              <h3 className="font-bold text-white text-base">Recent Orders</h3>
-              <p className="text-xs text-slate-500 mt-1">Latest purchases made by customers</p>
+              <h3 className="font-bold text-stone-900 text-base">Recent Orders</h3>
+              <p className="text-xs text-stone-500 mt-1">Latest purchases made by customers</p>
             </div>
             <Link
               href="/admin/orders"
-              className="flex items-center gap-1 text-xs font-semibold text-indigo-400 hover:text-white transition-colors"
+              className="flex items-center gap-1 text-xs font-semibold text-forest-700 hover:text-forest-600 transition-colors"
             >
               View All Orders
               <ArrowRight size={14} />
@@ -122,10 +123,10 @@ export default async function AdminDashboardPage() {
               <table className="w-full text-left border-collapse text-sm">
                 <thead>
                   <tr
-                    className="border-b text-slate-400 font-semibold"
+                    className="border-b text-stone-500 font-semibold"
                     style={{
-                      borderColor: "rgba(255, 255, 255, 0.05)",
-                      background: "rgba(15, 23, 42, 0.2)",
+                      borderColor: "var(--color-stone-100)",
+                      background: "var(--color-stone-50)",
                     }}
                   >
                     <th className="p-4 pl-6 text-xs uppercase tracking-wider">Order ID</th>
@@ -135,23 +136,24 @@ export default async function AdminDashboardPage() {
                     <th className="p-4 pr-6 text-xs uppercase tracking-wider">Date</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y" style={{ borderColor: "rgba(255, 255, 255, 0.05)" }}>
+                <tbody className="divide-y" style={{ borderColor: "var(--color-stone-100)" }}>
                   {recentOrders.map((order) => (
                     <tr
                       key={order.id}
-                      className="hover:bg-slate-800/20 text-slate-300 transition-colors"
+                      className="hover:bg-stone-50/50 text-stone-600 transition-colors border-b"
+                      style={{ borderColor: "var(--color-stone-100)" }}
                     >
-                      <td className="p-4 pl-6 font-mono text-xs text-indigo-400">
+                      <td className="p-4 pl-6 font-mono text-xs text-stone-500 font-medium">
                         #{order.id.slice(-8).toUpperCase()}
                       </td>
-                      <td className="p-4 font-medium text-white">{order.customerName}</td>
-                      <td className="p-4 font-semibold text-white">
+                      <td className="p-4 font-medium text-stone-900">{order.customerName}</td>
+                      <td className="p-4 font-semibold text-stone-900">
                         ₹{order.totalAmount}
                       </td>
                       <td className="p-4">
                         <OrderStatusBadge status={order.status} />
                       </td>
-                      <td className="p-4 pr-6 text-slate-400 text-xs">
+                      <td className="p-4 pr-6 text-stone-500 text-xs">
                         {new Date(order.createdAt).toLocaleDateString("en-IN", {
                           day: "numeric",
                           month: "short",
@@ -163,7 +165,7 @@ export default async function AdminDashboardPage() {
                 </tbody>
               </table>
             ) : (
-              <div className="p-8 text-center text-slate-500">
+              <div className="p-8 text-center text-stone-500 font-medium">
                 No orders found. Set up some products and start selling!
               </div>
             )}
@@ -174,24 +176,25 @@ export default async function AdminDashboardPage() {
         <div
           className="rounded-2xl border p-6 flex flex-col justify-between"
           style={{
-            background: "rgba(30, 41, 59, 0.3)",
-            borderColor: "rgba(255, 255, 255, 0.05)",
+            background: "white",
+            borderColor: "var(--color-stone-200)",
+            boxShadow: "var(--shadow-card)",
           }}
         >
           <div>
-            <h3 className="font-bold text-white text-base mb-2">Store Performance</h3>
-            <p className="text-xs text-slate-500 mb-6">Overview metrics of active inventory items</p>
+            <h3 className="font-bold text-stone-900 text-base mb-2">Store Performance</h3>
+            <p className="text-xs text-stone-500 mb-6">Overview metrics of active inventory items</p>
 
             <div className="space-y-4">
               {/* Stat Progress 1 */}
               <div>
                 <div className="flex justify-between text-xs font-semibold mb-1">
-                  <span className="text-slate-400">Target Monthly Sales</span>
-                  <span className="text-white">65% Achieved</span>
+                  <span className="text-stone-500">Target Monthly Sales</span>
+                  <span className="text-stone-800 font-semibold">65% Achieved</span>
                 </div>
-                <div className="h-2 w-full bg-slate-800 rounded-full overflow-hidden">
+                <div className="h-2 w-full bg-stone-100 rounded-full overflow-hidden">
                   <div
-                    className="h-full bg-indigo-500 rounded-full"
+                    className="h-full bg-forest-600 rounded-full"
                     style={{ width: "65%" }}
                   />
                 </div>
@@ -200,12 +203,12 @@ export default async function AdminDashboardPage() {
               {/* Stat Progress 2 */}
               <div>
                 <div className="flex justify-between text-xs font-semibold mb-1">
-                  <span className="text-slate-400">Stock Availability</span>
-                  <span className="text-white">92% In Stock</span>
+                  <span className="text-stone-500">Stock Availability</span>
+                  <span className="text-stone-800 font-semibold">92% In Stock</span>
                 </div>
-                <div className="h-2 w-full bg-slate-800 rounded-full overflow-hidden">
+                <div className="h-2 w-full bg-stone-100 rounded-full overflow-hidden">
                   <div
-                    className="h-full bg-emerald-500 rounded-full"
+                    className="h-full bg-emerald-600 rounded-full"
                     style={{ width: "92%" }}
                   />
                 </div>
@@ -214,10 +217,10 @@ export default async function AdminDashboardPage() {
               {/* Stat Progress 3 */}
               <div>
                 <div className="flex justify-between text-xs font-semibold mb-1">
-                  <span className="text-slate-400">Customer Satisfaction</span>
-                  <span className="text-white">4.8 / 5 Rating</span>
+                  <span className="text-stone-500">Customer Satisfaction</span>
+                  <span className="text-stone-800 font-semibold">4.8 / 5 Rating</span>
                 </div>
-                <div className="h-2 w-full bg-slate-800 rounded-full overflow-hidden">
+                <div className="h-2 w-full bg-stone-100 rounded-full overflow-hidden">
                   <div
                     className="h-full bg-amber-500 rounded-full"
                     style={{ width: "96%" }}
@@ -229,13 +232,13 @@ export default async function AdminDashboardPage() {
 
           <div
             className="mt-8 pt-6 border-t flex items-center justify-between"
-            style={{ borderColor: "rgba(255, 255, 255, 0.05)" }}
+            style={{ borderColor: "var(--color-stone-100)" }}
           >
             <div className="flex items-center gap-2">
-              <TrendingUp size={16} className="text-emerald-400" />
-              <span className="text-xs font-semibold text-emerald-400">Upward Growth trend</span>
+              <TrendingUp size={16} className="text-emerald-600" />
+              <span className="text-xs font-semibold text-emerald-700">Upward Growth trend</span>
             </div>
-            <span className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">
+            <span className="text-[10px] text-stone-400 font-bold uppercase tracking-wider">
               Updated just now
             </span>
           </div>

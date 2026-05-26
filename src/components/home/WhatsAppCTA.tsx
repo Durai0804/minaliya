@@ -36,7 +36,7 @@ export default function WhatsAppCTA() {
 
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
           <a
-            href="https://wa.me/919876543210?text=Hi%20Minaliya!%20I%20want%20to%20order%20cold%20pressed%20oil."
+            href="https://wa.me/917824807770?text=Hi"
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center justify-center gap-2.5 px-8 py-4 rounded-full font-semibold text-base transition-all hover:-translate-y-0.5 hover:shadow-xl"
@@ -49,7 +49,7 @@ export default function WhatsAppCTA() {
             WhatsApp Order
           </a>
           <a
-            href="tel:+919876543210"
+            href="tel:+917824807770"
             className="inline-flex items-center justify-center gap-2.5 px-8 py-4 rounded-full font-semibold text-base transition-all hover:-translate-y-0.5"
             style={{
               background: "rgba(255, 255, 255, 0.12)",

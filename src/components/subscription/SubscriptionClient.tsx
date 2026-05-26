@@ -713,7 +713,7 @@ export default function SubscriptionClient() {
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <a
-              href="https://wa.me/919876543210?text=Hi%20Minaliya!%20I%27d%20like%20to%20subscribe%20for%20monthly%20oil%20delivery."
+              href="https://wa.me/917824807770?text=Hi%20Minaliya!%20I%27d%20like%20to%20subscribe%20for%20monthly%20oil%20delivery."
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2 px-8 py-4 rounded-full font-semibold text-base transition-all duration-300 hover:shadow-xl hover:-translate-y-0.5"

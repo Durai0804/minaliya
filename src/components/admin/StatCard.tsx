@@ -9,7 +9,7 @@ interface StatCardProps {
     value: string;
     positive: boolean;
   };
-  color?: string; // Optional custom color scheme
+  color?: string;
 }
 
 export default function StatCard({
@@ -18,50 +18,54 @@ export default function StatCard({
   icon: Icon,
   description,
   trend,
-  color = "indigo",
+  color = "forest",
 }: StatCardProps) {
-  // Map color names to classes safely
-  const colorMap: Record<string, { bg: string; text: string; border: string }> = {
-    indigo: {
-      bg: "rgba(99, 102, 241, 0.1)",
-      text: "#818cf8",
-      border: "rgba(99, 102, 241, 0.2)",
+  const colorMap: Record<string, { bg: string; text: string; iconBg: string }> = {
+    forest: {
+      bg: "var(--color-forest-50)",
+      text: "var(--color-forest-600)",
+      iconBg: "var(--color-forest-100)",
     },
-    emerald: {
-      bg: "rgba(16, 185, 129, 0.1)",
-      text: "#34d399",
-      border: "rgba(16, 185, 129, 0.2)",
+    indigo: {
+      bg: "#eef2ff",
+      text: "#4f46e5",
+      iconBg: "#e0e7ff",
     },
     amber: {
-      bg: "rgba(245, 158, 11, 0.1)",
-      text: "#fbbf24",
-      border: "rgba(245, 158, 11, 0.2)",
+      bg: "var(--color-amber-50)",
+      text: "var(--color-amber-600)",
+      iconBg: "var(--color-amber-100)",
+    },
+    emerald: {
+      bg: "#ecfdf5",
+      text: "#059669",
+      iconBg: "#d1fae5",
     },
     rose: {
-      bg: "rgba(244, 63, 94, 0.1)",
-      text: "#fb7185",
-      border: "rgba(244, 63, 94, 0.2)",
+      bg: "#fff1f2",
+      text: "#e11d48",
+      iconBg: "#ffe4e6",
     },
   };
 
-  const scheme = colorMap[color] || colorMap.indigo;
+  const scheme = colorMap[color] || colorMap.forest;
 
   return (
     <div
       className="p-6 rounded-2xl border transition-all duration-300 hover:-translate-y-0.5"
       style={{
-        background: "rgba(30, 41, 59, 0.4)",
-        borderColor: "rgba(255, 255, 255, 0.05)",
+        background: "white",
+        borderColor: "var(--color-stone-200)",
+        boxShadow: "var(--shadow-card)",
       }}
     >
       <div className="flex items-center justify-between mb-4">
-        <span className="text-sm font-medium text-slate-400">{title}</span>
+        <span className="text-sm font-medium" style={{ color: "var(--color-stone-500)" }}>{title}</span>
         <div
-          className="w-10 h-10 rounded-xl flex items-center justify-center border"
+          className="w-10 h-10 rounded-xl flex items-center justify-center"
           style={{
-            background: scheme.bg,
+            background: scheme.iconBg,
             color: scheme.text,
-            borderColor: scheme.border,
           }}
         >
           <Icon size={20} />
@@ -69,16 +73,16 @@ export default function StatCard({
       </div>
 
       <div className="flex items-baseline gap-2">
-        <span className="text-2xl font-bold text-white tracking-tight">
+        <span className="text-2xl font-bold tracking-tight" style={{ color: "var(--color-stone-900)" }}>
           {value}
         </span>
         {trend && (
           <span
-            className={`text-xs font-semibold px-2 py-0.5 rounded-full ${
-              trend.positive
-                ? "bg-emerald-500/10 text-emerald-400"
-                : "bg-rose-500/10 text-rose-400"
-            }`}
+            className="text-xs font-semibold px-2 py-0.5 rounded-full"
+            style={{
+              background: trend.positive ? "#ecfdf5" : "#fff1f2",
+              color: trend.positive ? "#059669" : "#e11d48",
+            }}
           >
             {trend.value}
           </span>
@@ -86,7 +90,7 @@ export default function StatCard({
       </div>
 
       {description && (
-        <p className="text-xs text-slate-500 mt-2 font-medium">
+        <p className="text-xs mt-2 font-medium" style={{ color: "var(--color-stone-400)" }}>
           {description}
         </p>
       )}

@@ -7,41 +7,41 @@ export default function OrderStatusBadge({ status }: OrderStatusBadgeProps) {
 
   const styles: Record<string, { bg: string; text: string; border: string; label: string }> = {
     PENDING: {
-      bg: "rgba(245, 158, 11, 0.1)", // Amber
-      text: "#fbbf24",
-      border: "rgba(245, 158, 11, 0.2)",
+      bg: "#fffbeb",
+      text: "#b45309",
+      border: "#fde68a",
       label: "Pending",
     },
     PROCESSING: {
-      bg: "rgba(99, 102, 241, 0.1)", // Indigo/Blue
-      text: "#818cf8",
-      border: "rgba(99, 102, 241, 0.2)",
+      bg: "#eef2ff",
+      text: "#4338ca",
+      border: "#c7d2fe",
       label: "Processing",
     },
     SHIPPED: {
-      bg: "rgba(6, 182, 212, 0.1)", // Cyan
-      text: "#22d3ee",
-      border: "rgba(6, 182, 212, 0.2)",
+      bg: "#f5f3ff",
+      text: "#7c3aed",
+      border: "#ddd6fe",
       label: "Shipped",
     },
     DELIVERED: {
-      bg: "rgba(16, 185, 129, 0.1)", // Emerald
-      text: "#34d399",
-      border: "rgba(16, 185, 129, 0.2)",
+      bg: "var(--color-forest-50)",
+      text: "var(--color-forest-700)",
+      border: "var(--color-forest-200)",
       label: "Delivered",
     },
     CANCELLED: {
-      bg: "rgba(244, 63, 94, 0.1)", // Rose
-      text: "#fb7185",
-      border: "rgba(244, 63, 94, 0.2)",
+      bg: "#fff1f2",
+      text: "#be123c",
+      border: "#fecdd3",
       label: "Cancelled",
     },
   };
 
   const style = styles[cleanStatus] || {
-    bg: "rgba(148, 163, 184, 0.1)", // Slate grey
-    text: "#94a3b8",
-    border: "rgba(148, 163, 184, 0.2)",
+    bg: "var(--color-stone-50)",
+    text: "var(--color-stone-600)",
+    border: "var(--color-stone-200)",
     label: status,
   };
 

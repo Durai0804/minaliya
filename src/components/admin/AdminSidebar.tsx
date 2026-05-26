@@ -37,7 +37,7 @@ export default function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
       {/* Mobile Backdrop */}
       {isOpen && (
         <div
-          className="fixed inset-0 z-40 bg-slate-900/60 backdrop-blur-sm lg:hidden"
+          className="fixed inset-0 z-40 bg-black/20 backdrop-blur-sm lg:hidden"
           onClick={onClose}
         />
       )}
@@ -47,35 +47,38 @@ export default function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
           isOpen ? "translate-x-0" : "-translate-x-full"
         }`}
         style={{
-          background: "#0f172a", // Deep slate
-          borderColor: "rgba(255, 255, 255, 0.05)",
+          background: "white",
+          borderColor: "var(--color-stone-200)",
         }}
       >
         {/* Sidebar Header */}
         <div
           className="flex items-center justify-between h-16 px-6 border-b"
-          style={{ borderColor: "rgba(255, 255, 255, 0.05)" }}
+          style={{ borderColor: "var(--color-stone-200)" }}
         >
           <Link href="/admin" className="flex items-center gap-2">
             <div
               className="w-8 h-8 rounded-lg flex items-center justify-center"
               style={{
-                background: "linear-gradient(135deg, rgba(99, 102, 241, 0.2), rgba(16, 185, 129, 0.2))",
-                border: "1px solid rgba(99, 102, 241, 0.3)",
+                background: "var(--color-forest-50)",
+                border: "1px solid var(--color-forest-100)",
               }}
             >
-              <ShieldAlert size={16} style={{ color: "#818cf8" }} />
+              <ShieldAlert size={16} style={{ color: "var(--color-forest-600)" }} />
             </div>
             <span
-              className="text-lg font-bold text-white tracking-wide"
-              style={{ fontFamily: "var(--font-heading)" }}
+              className="text-lg font-bold tracking-wide"
+              style={{ fontFamily: "var(--font-heading)", color: "var(--color-stone-800)" }}
             >
               Minaliya Admin
             </span>
           </Link>
           <button
             onClick={onClose}
-            className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 lg:hidden"
+            className="p-1.5 rounded-lg lg:hidden transition-colors"
+            style={{ color: "var(--color-stone-400)" }}
+            onMouseEnter={(e) => { e.currentTarget.style.color = "var(--color-stone-700)"; e.currentTarget.style.background = "var(--color-stone-100)"; }}
+            onMouseLeave={(e) => { e.currentTarget.style.color = "var(--color-stone-400)"; e.currentTarget.style.background = "transparent"; }}
           >
             <X size={18} />
           </button>
@@ -92,18 +95,28 @@ export default function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
                 key={item.name}
                 href={item.href}
                 onClick={onClose}
-                className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 ${
-                  isActive
-                    ? "text-white bg-indigo-600/10 border border-indigo-500/20"
-                    : "text-slate-400 hover:text-white hover:bg-slate-800 border border-transparent"
-                }`}
+                className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200"
                 style={{
-                  boxShadow: isActive ? "0 4px 12px rgba(99, 102, 241, 0.05)" : "none",
+                  color: isActive ? "var(--color-forest-700)" : "var(--color-stone-600)",
+                  background: isActive ? "var(--color-forest-50)" : "transparent",
+                  borderLeft: isActive ? "3px solid var(--color-forest-500)" : "3px solid transparent",
+                }}
+                onMouseEnter={(e) => {
+                  if (!isActive) {
+                    e.currentTarget.style.background = "var(--color-stone-50)";
+                    e.currentTarget.style.color = "var(--color-stone-800)";
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (!isActive) {
+                    e.currentTarget.style.background = "transparent";
+                    e.currentTarget.style.color = "var(--color-stone-600)";
+                  }
                 }}
               >
                 <Icon
                   size={18}
-                  className={isActive ? "text-indigo-400" : "text-slate-400"}
+                  style={{ color: isActive ? "var(--color-forest-600)" : "var(--color-stone-400)" }}
                 />
                 {item.name}
               </Link>
@@ -114,21 +127,46 @@ export default function AdminSidebar({ isOpen, onClose }: AdminSidebarProps) {
         {/* Footer Admin Info & Logout */}
         <div
           className="p-4 border-t"
-          style={{ borderColor: "rgba(255, 255, 255, 0.05)" }}
+          style={{ borderColor: "var(--color-stone-200)" }}
         >
-          <div className="flex items-center gap-3 px-3 py-2.5 mb-3 rounded-xl bg-slate-800/40 border border-slate-800">
-            <div className="w-8 h-8 rounded-full bg-indigo-500/10 flex items-center justify-center text-xs font-bold text-indigo-400 border border-indigo-500/20">
+          <div
+            className="flex items-center gap-3 px-3 py-2.5 mb-3 rounded-xl"
+            style={{
+              background: "var(--color-cream-100)",
+              border: "1px solid var(--color-stone-200)",
+            }}
+          >
+            <div
+              className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold"
+              style={{
+                background: "var(--color-forest-50)",
+                color: "var(--color-forest-600)",
+                border: "1px solid var(--color-forest-100)",
+              }}
+            >
               AD
             </div>
             <div className="min-w-0">
-              <p className="text-xs font-semibold text-white truncate">Administrator</p>
-              <p className="text-[10px] text-slate-400 truncate">mailme@minaliya.in</p>
+              <p className="text-xs font-semibold truncate" style={{ color: "var(--color-stone-800)" }}>Administrator</p>
+              <p className="text-[10px] truncate" style={{ color: "var(--color-stone-500)" }}>mailme@minaliya.in</p>
             </div>
           </div>
 
           <button
             onClick={handleLogout}
-            className="flex items-center justify-center gap-2 w-full px-4 py-3 rounded-xl text-sm font-semibold text-rose-400 hover:text-white hover:bg-rose-500/10 border border-transparent hover:border-rose-500/20 transition-all duration-200"
+            className="flex items-center justify-center gap-2 w-full px-4 py-3 rounded-xl text-sm font-semibold transition-all duration-200"
+            style={{
+              color: "var(--color-terra-500)",
+              border: "1px solid transparent",
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.background = "var(--color-terra-50)";
+              e.currentTarget.style.borderColor = "var(--color-terra-200)";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background = "transparent";
+              e.currentTarget.style.borderColor = "transparent";
+            }}
           >
             <LogOut size={16} />
             Logout

@@ -11,14 +11,14 @@ export default async function AdminOrdersPage() {
       {/* Header section */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-xl font-bold text-white" style={{ fontFamily: "var(--font-heading)" }}>
+          <h2 className="text-xl font-bold text-stone-900" style={{ fontFamily: "var(--font-heading)" }}>
             Manage Storefront Orders
           </h2>
-          <p className="text-xs text-slate-500 mt-1">
+          <p className="text-xs text-stone-500 mt-1">
             Track customer orders, review items, update delivery fulfillment statuses, and manage payments.
           </p>
         </div>
-        <div className="px-3 py-1 text-xs font-semibold rounded-full bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
+        <div className="px-3 py-1 text-xs font-semibold rounded-full bg-forest-50 text-forest-700 border border-forest-200 shadow-sm">
           {orders.length} Total Orders
         </div>
       </div>

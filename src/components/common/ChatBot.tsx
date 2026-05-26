@@ -21,8 +21,8 @@ export default function ChatBot() {
     return () => clearTimeout(timer);
   }, []);
 
-  const phoneNumber = "919841422998";
-  const message = "I would like to know about your products or order";
+  const phoneNumber = "917824807770";
+  const message = "Hi";
   const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
 
   return (

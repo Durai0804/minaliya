@@ -39,10 +39,10 @@ export async function adminLogin(
 
   // Normalize inputs
   const normalizedEmail = email.trim().toLowerCase();
-  const normalizedPhone = phone.replace(/[\s\-()]/g, "");
+  const normalizedPhone = phone.replace(/\D/g, "").slice(-10);
 
   const expectedEmail = adminEmail.trim().toLowerCase();
-  const expectedPhone = adminPhone.replace(/[\s\-()]/g, "");
+  const expectedPhone = adminPhone.replace(/\D/g, "").slice(-10);
 
   if (normalizedEmail !== expectedEmail || normalizedPhone !== expectedPhone) {
     return { success: false, error: "Invalid credentials. Access denied." };

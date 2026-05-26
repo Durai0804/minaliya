@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { updateUserAction } from "@/actions/auth";
 
 interface User {
+  id?: string;
   name: string;
   mobile: string;
   email?: string;

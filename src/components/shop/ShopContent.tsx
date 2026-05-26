@@ -54,8 +54,8 @@ function ProductCard({ product }: { product: Product }) {
                   product.badge === "Bestseller"
                     ? "var(--color-forest-600)"
                     : product.badge === "Popular"
-                    ? "var(--color-amber-500)"
-                    : "var(--color-terra-400)",
+                      ? "var(--color-amber-500)"
+                      : "var(--color-terra-400)",
                 color: "white",
               }}
             >
@@ -80,9 +80,9 @@ function ProductCard({ product }: { product: Product }) {
           <div className="absolute right-4 bottom-4 flex flex-col gap-2 opacity-0 translate-x-4 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300">
             <button
               className="w-10 h-10 rounded-full flex items-center justify-center shadow-md transition-colors"
-              style={{ 
-                background: "white", 
-                color: isWishlisted ? "var(--color-terra-500)" : "var(--color-stone-600)" 
+              style={{
+                background: "white",
+                color: isWishlisted ? "var(--color-terra-500)" : "var(--color-stone-600)"
               }}
               aria-label={isWishlisted ? "Remove from wishlist" : "Add to wishlist"}
               onClick={(e) => {
@@ -323,11 +323,10 @@ export default function ShopContent({ initialProducts }: { initialProducts: Prod
                     activeCategory === cat ? "var(--color-forest-600)" : "white",
                   color:
                     activeCategory === cat ? "white" : "var(--color-stone-600)",
-                  border: `1px solid ${
-                    activeCategory === cat
+                  border: `1px solid ${activeCategory === cat
                       ? "var(--color-forest-600)"
                       : "var(--color-stone-200)"
-                  }`,
+                    }`,
                 }}
               >
                 {cat}
@@ -421,7 +420,7 @@ export default function ShopContent({ initialProducts }: { initialProducts: Prod
       {isBulkModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in">
           <div className="relative w-full max-w-2xl bg-white rounded-3xl shadow-deep overflow-hidden border border-stone-200 max-h-[90vh] flex flex-col animate-scale-up">
-            
+
             {/* Header */}
             <div className="p-6 border-b border-stone-100 flex items-center justify-between shrink-0" style={{ background: "var(--color-cream-50)" }}>
               <div className="flex items-center gap-2">
@@ -462,7 +461,7 @@ export default function ShopContent({ initialProducts }: { initialProducts: Prod
 
                   <div className="flex flex-col sm:flex-row gap-3 justify-center pt-4 max-w-md mx-auto font-sans">
                     <a
-                      href={`https://wa.me/919876543210?text=Hi%20Minaliya,%20I%20just%20submitted%20a%20bulk%20order%20inquiry%20with%20reference%20ID%20${inquiryId}.%20Please%20share%20wholesale%20pricing.`}
+                      href={`https://wa.me/917824807770?text=Hi%20Minaliya,%20I%20just%20submitted%20a%20bulk%20order%20inquiry%20with%20reference%20ID%20${inquiryId}.%20Please%20share%20wholesale%20pricing.`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="btn-primary py-3 px-6 rounded-full text-sm font-semibold flex items-center justify-center gap-2 cursor-pointer bg-green-600 hover:bg-green-700 text-white border-transparent"
