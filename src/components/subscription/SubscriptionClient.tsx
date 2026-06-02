@@ -234,7 +234,7 @@ export default function SubscriptionClient() {
           </div>
 
           <h1
-            className="text-4xl sm:text-5xl lg:text-6xl font-bold leading-tight mb-6"
+            className="text-3xl sm:text-5xl lg:text-6xl font-bold leading-tight mb-6"
             style={{
               fontFamily: "var(--font-display)",
               color: "white",
@@ -414,7 +414,7 @@ export default function SubscriptionClient() {
                   </div>
                 )}
 
-                <div className="p-8 sm:p-10">
+                <div className="p-6 sm:p-10">
                   {/* Plan name */}
                   <h3
                     className="text-lg font-semibold mb-1"
@@ -523,7 +523,7 @@ export default function SubscriptionClient() {
                   <button
                     disabled={loadingPlan !== null}
                     onClick={() => handleSubscribe(plan)}
-                    className="w-full py-4 rounded-full font-bold text-sm tracking-wide transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5 flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+                    className="w-full py-3 sm:py-4 rounded-full font-bold text-sm tracking-wide transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5 flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
                     style={{
                       background: plan.highlight
                         ? "var(--color-amber-400)"

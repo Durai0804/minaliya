@@ -127,7 +127,7 @@ export default function HeroSection() {
   return (
     <section
       id="hero"
-      className="relative w-full overflow-hidden h-auto lg:h-[calc(100vh-100px)] min-h-[580px] lg:min-h-0"
+      className="relative w-full overflow-hidden h-auto lg:h-[calc(100vh-100px)] min-h-[500px] sm:min-h-[580px] lg:min-h-0"
       aria-label="Hero product showcase"
     >
       {/* ─── COLOR-MORPHING BACKGROUND ─── */}
@@ -223,7 +223,7 @@ export default function HeroSection() {
 
       {/* ─── MAIN CONTENT ─── */}
       <div className="relative z-10 max-w-[1440px] mx-auto px-5 sm:px-8 lg:px-12 h-auto lg:h-full flex items-center py-10 lg:py-0">
-        <div className="w-full grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-6 items-center pt-14 lg:pt-0 pb-16 lg:pb-0">
+        <div className="w-full grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-6 items-center pt-10 sm:pt-14 lg:pt-0 pb-20 sm:pb-16 lg:pb-0">
 
           {/* ─── LEFT: TYPOGRAPHY (Smooth Cinematic Transition) ─── */}
           <div className="lg:col-span-7 xl:col-span-6 relative z-20 order-2 lg:order-1 text-center lg:text-left flex flex-col justify-center">
@@ -259,10 +259,10 @@ export default function HeroSection() {
                     <span
                       key={i}
                       className={`inline-block mr-3 ${part.style === "display"
-                        ? "text-[clamp(2rem,4.5vw,4.6rem)] font-light block"
+                        ? "text-[clamp(1.75rem,5vw,4.6rem)] font-light block"
                         : part.style === "serif-italic"
-                          ? "text-[clamp(2rem,4.5vw,4.6rem)] font-normal italic block"
-                          : "text-[clamp(1.5rem,3vw,2.4rem)] font-semibold block mt-1"
+                          ? "text-[clamp(1.75rem,5vw,4.6rem)] font-normal italic block"
+                          : "text-[clamp(1.3rem,4vw,2.4rem)] font-semibold block mt-1"
                         }`}
                       style={{
                         fontFamily:
@@ -393,7 +393,7 @@ export default function HeroSection() {
                 className="relative z-10"
               >
                 {/* ── Product bottle ── */}
-                <div className="w-[290px] sm:w-[240px] md:w-[280px] lg:w-[290px] xl:w-[280px] hero-animate-float relative">
+                <div className="w-[220px] sm:w-[240px] md:w-[280px] lg:w-[290px] xl:w-[280px] hero-animate-float relative mx-auto lg:mx-0">
                   <Image
                     src={slide.image}
                     alt={slide.imageAlt}

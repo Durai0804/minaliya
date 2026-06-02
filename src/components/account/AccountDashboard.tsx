@@ -716,7 +716,7 @@ export default function AccountDashboard() {
                   {displayOrders.map((order: any) => (
                     <div key={order.id} className="rounded-xl border overflow-hidden" style={{ background: "var(--color-cream-50)", borderColor: "var(--color-stone-200)" }}>
                       <div className="p-5 border-b flex flex-col sm:flex-row justify-between sm:items-center gap-4" style={{ borderColor: "var(--color-stone-200)", background: "white" }}>
-                        <div className="flex gap-8">
+                        <div className="flex flex-col sm:flex-row gap-4 sm:gap-8">
                           <div>
                             <p className="text-xs text-stone-500 mb-0.5 uppercase tracking-wider font-bold">Order Placed</p>
                             <p className="text-sm font-medium text-stone-900">{new Date(order.date).toLocaleDateString()}</p>
@@ -780,7 +780,7 @@ export default function AccountDashboard() {
                       style={{ background: "var(--color-cream-50)", borderColor: "var(--color-stone-200)" }}
                     >
                       <div className="p-5 border-b flex flex-col sm:flex-row justify-between sm:items-center gap-4" style={{ borderColor: "var(--color-stone-200)", background: "white" }}>
-                        <div className="flex gap-8">
+                        <div className="flex flex-col sm:flex-row gap-4 sm:gap-8">
                           <div>
                             <p className="text-xs text-stone-500 mb-0.5 uppercase tracking-wider font-bold">Inquiry Sent</p>
                             <p className="text-sm font-medium text-stone-900">{new Date(inquiry.date).toLocaleDateString()}</p>

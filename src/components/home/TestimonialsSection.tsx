@@ -70,11 +70,11 @@ export default function TestimonialsSection() {
         </div>
 
         {/* Testimonial Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
           {testimonials.map((t, i) => (
             <div
               key={i}
-              className="p-6 rounded-2xl space-y-4 transition-all duration-300 hover:shadow-md"
+              className="p-5 sm:p-6 rounded-2xl space-y-4 transition-all duration-300 hover:shadow-md"
               style={{
                 background: "var(--color-cream-50)",
                 border: "1px solid var(--color-stone-200)",

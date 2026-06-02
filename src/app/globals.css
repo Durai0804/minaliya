@@ -374,6 +374,20 @@ h1, h2, h3, h4, h5, h6 {
   }
 }
 
+@media (max-width: 480px) {
+  .section-padding {
+    padding: 3rem 0;
+  }
+}
+
+/* Touch device utilities to show hover-dependent elements */
+@media (hover: none) {
+  .touch-action-show {
+    opacity: 1 !important;
+    transform: translate(0, 0) !important;
+  }
+}
+
 .section-title {
   font-family: var(--font-heading);
   font-size: clamp(2rem, 4vw, 3rem);

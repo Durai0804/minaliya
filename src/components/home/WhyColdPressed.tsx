@@ -78,49 +78,51 @@ export default function WhyColdPressed() {
 
         {/* Comparison Table */}
         <div className="max-w-3xl mx-auto mb-20">
-          <div
-            className="rounded-2xl overflow-hidden shadow-sm"
-            style={{ border: "1px solid var(--color-stone-200)" }}
-          >
-            {/* Table Header */}
+          <div className="overflow-x-auto pb-2 -mx-4 px-4 sm:mx-0 sm:px-0">
             <div
-              className="grid grid-cols-3 text-sm font-semibold"
-              style={{ background: "var(--color-forest-600)", color: "white" }}
+              className="rounded-2xl overflow-hidden shadow-sm min-w-[500px]"
+              style={{ border: "1px solid var(--color-stone-200)" }}
             >
-              <div className="px-5 py-4">Feature</div>
-              <div className="px-5 py-4 text-center">Cold Pressed ✅</div>
-              <div className="px-5 py-4 text-center">Refined Oil ❌</div>
-            </div>
-            {/* Rows */}
-            {comparisons.map((row, i) => (
+              {/* Table Header */}
               <div
-                key={i}
-                className="grid grid-cols-3 text-sm border-b last:border-b-0"
-                style={{
-                  borderColor: "var(--color-stone-100)",
-                  background: i % 2 === 0 ? "white" : "var(--color-cream-50)",
-                }}
+                className="grid grid-cols-3 text-xs sm:text-sm font-semibold"
+                style={{ background: "var(--color-forest-600)", color: "white" }}
               >
-                <div
-                  className="px-5 py-4 font-medium"
-                  style={{ color: "var(--color-stone-700)" }}
-                >
-                  {row.feature}
-                </div>
-                <div
-                  className="px-5 py-4 text-center font-medium"
-                  style={{ color: "var(--color-forest-600)" }}
-                >
-                  {row.coldPressed}
-                </div>
-                <div
-                  className="px-5 py-4 text-center"
-                  style={{ color: "var(--color-stone-400)" }}
-                >
-                  {row.refined}
-                </div>
+                <div className="px-3 sm:px-5 py-3 sm:py-4">Feature</div>
+                <div className="px-3 sm:px-5 py-3 sm:py-4 text-center">Cold Pressed ✅</div>
+                <div className="px-3 sm:px-5 py-3 sm:py-4 text-center">Refined Oil ❌</div>
               </div>
-            ))}
+              {/* Rows */}
+              {comparisons.map((row, i) => (
+                <div
+                  key={i}
+                  className="grid grid-cols-3 text-xs sm:text-sm border-b last:border-b-0"
+                  style={{
+                    borderColor: "var(--color-stone-100)",
+                    background: i % 2 === 0 ? "white" : "var(--color-cream-50)",
+                  }}
+                >
+                  <div
+                    className="px-3 sm:px-5 py-3 sm:py-4 font-medium"
+                    style={{ color: "var(--color-stone-700)" }}
+                  >
+                    {row.feature}
+                  </div>
+                  <div
+                    className="px-3 sm:px-5 py-3 sm:py-4 text-center font-medium"
+                    style={{ color: "var(--color-forest-600)" }}
+                  >
+                    {row.coldPressed}
+                  </div>
+                  <div
+                    className="px-3 sm:px-5 py-3 sm:py-4 text-center"
+                    style={{ color: "var(--color-stone-400)" }}
+                  >
+                    {row.refined}
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
 

@@ -34,7 +34,7 @@ function ProductCard({ product }: { product: Product }) {
     <Link href={`/shop/${product.slug}`} className="block">
       <article className="product-card group relative">
         {/* Image */}
-        <div className="product-image relative aspect-[3/4] p-6 flex items-center justify-center">
+        <div className="product-image relative aspect-[3/4] p-3 sm:p-6 flex items-center justify-center">
           <Image
             src={product.image}
             alt={`${product.name} - Minaliya Mara Chekku Wood Pressed Oil`}
@@ -48,7 +48,7 @@ function ProductCard({ product }: { product: Product }) {
           {/* Badge */}
           {product.badge && (
             <span
-              className="absolute top-4 left-4 px-3 py-1 rounded-full text-xs font-semibold"
+              className="absolute top-2 sm:top-4 left-2 sm:left-4 px-2 py-0.5 sm:px-3 sm:py-1 rounded-full text-[10px] sm:text-xs font-semibold"
               style={{
                 background:
                   product.badge === "Bestseller"
@@ -66,7 +66,7 @@ function ProductCard({ product }: { product: Product }) {
           {/* Discount Badge */}
           {discount > 0 && (
             <span
-              className="absolute top-4 right-4 px-2.5 py-1 rounded-full text-xs font-bold"
+              className="absolute top-2 sm:top-4 right-2 sm:right-4 px-1.5 sm:px-2.5 py-0.5 sm:py-1 rounded-full text-[10px] sm:text-xs font-bold"
               style={{
                 background: "var(--color-terra-100)",
                 color: "var(--color-terra-500)",
@@ -77,9 +77,9 @@ function ProductCard({ product }: { product: Product }) {
           )}
 
           {/* Quick Actions */}
-          <div className="absolute right-4 bottom-4 flex flex-col gap-2 opacity-0 translate-x-4 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300">
+          <div className="touch-action-show absolute right-2 sm:right-4 bottom-2 sm:bottom-4 flex flex-col gap-2 opacity-0 translate-x-4 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300">
             <button
-              className="w-10 h-10 rounded-full flex items-center justify-center shadow-md transition-colors"
+              className="w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center shadow-md transition-colors"
               style={{
                 background: "white",
                 color: isWishlisted ? "var(--color-terra-500)" : "var(--color-stone-600)"
@@ -96,28 +96,29 @@ function ProductCard({ product }: { product: Product }) {
                 });
               }}
             >
-              <Heart size={18} fill={isWishlisted ? "currentColor" : "none"} />
+              <Heart size={16} className="sm:w-[18px] sm:h-[18px]" fill={isWishlisted ? "currentColor" : "none"} />
             </button>
             <button
-              className="w-10 h-10 rounded-full flex items-center justify-center shadow-md transition-colors"
+              className="w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center shadow-md transition-colors"
               style={{ background: "white", color: "var(--color-stone-600)" }}
               aria-label="Quick view"
               onClick={(e) => e.preventDefault()}
             >
-              <Eye size={18} />
+              <Eye size={16} className="sm:w-[18px] sm:h-[18px]" />
             </button>
           </div>
         </div>
 
         {/* Content */}
-        <div className="p-5 space-y-3">
+        <div className="p-3 sm:p-5 space-y-2 sm:space-y-3">
           {/* Rating */}
           <div className="flex items-center gap-2">
             <div className="flex items-center gap-0.5">
               {[...Array(5)].map((_, i) => (
                 <Star
                   key={i}
-                  size={13}
+                  size={12}
+                  className="sm:w-[13px] sm:h-[13px]"
                   fill={i < Math.floor(product.rating) ? "var(--color-amber-400)" : "none"}
                   stroke={
                     i < Math.floor(product.rating)
@@ -127,14 +128,14 @@ function ProductCard({ product }: { product: Product }) {
                 />
               ))}
             </div>
-            <span className="text-xs font-medium" style={{ color: "var(--color-stone-400)" }}>
+            <span className="text-[10px] sm:text-xs font-medium" style={{ color: "var(--color-stone-400)" }}>
               {product.rating} ({product.reviews})
             </span>
           </div>
 
           {/* Name */}
           <h3
-            className="text-base font-semibold leading-snug"
+            className="text-sm sm:text-base font-semibold leading-snug line-clamp-2"
             style={{
               fontFamily: "var(--font-heading)",
               color: "var(--color-stone-800)",
@@ -144,11 +145,11 @@ function ProductCard({ product }: { product: Product }) {
           </h3>
 
           {/* Sizes */}
-          <div className="flex gap-2">
+          <div className="flex flex-wrap gap-1.5 sm:gap-2">
             {product.sizes.map((size) => (
               <span
                 key={size}
-                className="text-xs px-2.5 py-1 rounded-full font-medium"
+                className="text-[10px] sm:text-xs px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-full font-medium"
                 style={{
                   background: "var(--color-cream-100)",
                   color: "var(--color-stone-600)",
@@ -160,17 +161,17 @@ function ProductCard({ product }: { product: Product }) {
           </div>
 
           {/* Price + CTA */}
-          <div className="flex items-center justify-between pt-1">
-            <div className="flex items-baseline gap-2">
-              <span className="text-xl font-bold" style={{ color: "var(--color-stone-800)" }}>
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between pt-1 gap-2 sm:gap-0">
+            <div className="flex items-baseline gap-1.5 sm:gap-2">
+              <span className="text-base sm:text-xl font-bold" style={{ color: "var(--color-stone-800)" }}>
                 ₹{product.price}
               </span>
-              <span className="text-sm line-through" style={{ color: "var(--color-stone-400)" }}>
+              <span className="text-xs sm:text-sm line-through" style={{ color: "var(--color-stone-400)" }}>
                 ₹{product.originalPrice}
               </span>
             </div>
             <button
-              className="flex items-center gap-1.5 px-4 py-2.5 rounded-full text-xs font-semibold transition-all hover:shadow-md"
+              className="flex items-center justify-center gap-1.5 px-3 sm:px-4 py-2 sm:py-2.5 rounded-full text-[10px] sm:text-xs font-semibold transition-all hover:shadow-md min-h-[36px]"
               style={{ background: "var(--color-forest-600)", color: "white" }}
               aria-label={`Add ${product.name} to cart`}
               onClick={(e) => {
@@ -363,7 +364,7 @@ export default function ShopContent({ initialProducts }: { initialProducts: Prod
         </p>
 
         {/* Product Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6">
           {sorted.map((product) => (
             <ProductCard key={product.slug} product={product} />
           ))}
@@ -371,7 +372,7 @@ export default function ShopContent({ initialProducts }: { initialProducts: Prod
 
         {/* Bulk Order Banner */}
         <div
-          className="mt-16 p-8 sm:p-12 rounded-3xl border flex flex-col md:flex-row items-center justify-between gap-8 relative overflow-hidden shadow-soft transition-all hover:shadow-medium"
+          className="mt-16 p-6 sm:p-12 rounded-3xl border flex flex-col md:flex-row items-center justify-between gap-6 sm:gap-8 relative overflow-hidden shadow-soft transition-all hover:shadow-medium"
           style={{
             background: "linear-gradient(135deg, var(--color-forest-900) 0%, var(--color-forest-950) 100%)",
             borderColor: "var(--color-forest-800)",
@@ -422,7 +423,7 @@ export default function ShopContent({ initialProducts }: { initialProducts: Prod
           <div className="relative w-full max-w-2xl bg-white rounded-3xl shadow-deep overflow-hidden border border-stone-200 max-h-[90vh] flex flex-col animate-scale-up">
 
             {/* Header */}
-            <div className="p-6 border-b border-stone-100 flex items-center justify-between shrink-0" style={{ background: "var(--color-cream-50)" }}>
+            <div className="p-4 sm:p-6 border-b border-stone-100 flex items-center justify-between shrink-0" style={{ background: "var(--color-cream-50)" }}>
               <div className="flex items-center gap-2">
                 <span className="p-2 rounded-xl bg-amber-100 text-amber-700">
                   <Sparkles size={20} />
@@ -441,7 +442,7 @@ export default function ShopContent({ initialProducts }: { initialProducts: Prod
             </div>
 
             {/* Body */}
-            <div className="p-8 overflow-y-auto flex-1 space-y-6">
+            <div className="p-4 sm:p-8 overflow-y-auto flex-1 space-y-6">
               {isInquirySubmitted ? (
                 <div className="text-center py-8 space-y-6 animate-fade-in-up">
                   <div className="w-20 h-20 bg-forest-100 text-forest-700 rounded-full flex items-center justify-center mx-auto shadow-inner">

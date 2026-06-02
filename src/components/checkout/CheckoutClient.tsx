@@ -228,7 +228,7 @@ export default function CheckoutClient() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
+      <div className="flex flex-col-reverse lg:grid lg:grid-cols-12 gap-10">
         {/* Main Checkout Form */}
         <div className="lg:col-span-7 xl:col-span-8 space-y-8">
           {/* Breadcrumbs/Progress */}
@@ -237,8 +237,8 @@ export default function CheckoutClient() {
               onClick={() => setStep("shipping")}
               className={`text-sm font-bold flex items-center gap-2 ${step === "shipping" ? "text-stone-900" : "text-stone-400"}`}
             >
-              <span className={`w-6 h-6 rounded-full flex items-center justify-center text-xs ${step === "shipping" ? "bg-stone-900 text-white" : "bg-stone-200 text-stone-500"}`}>1</span>
-              Shipping Details
+              <span className={`w-6 h-6 shrink-0 rounded-full flex items-center justify-center text-xs ${step === "shipping" ? "bg-stone-900 text-white" : "bg-stone-200 text-stone-500"}`}>1</span>
+              <span className="hidden sm:inline">Shipping Details</span><span className="sm:hidden">Shipping</span>
             </button>
             <div className="h-px w-8 bg-stone-200" />
             <button
@@ -251,7 +251,7 @@ export default function CheckoutClient() {
               }}
               className={`text-sm font-bold flex items-center gap-2 ${step === "payment" ? "text-stone-900" : "text-stone-400"}`}
             >
-              <span className={`w-6 h-6 rounded-full flex items-center justify-center text-xs ${step === "payment" ? "bg-stone-900 text-white" : "bg-stone-200 text-stone-500"}`}>2</span>
+              <span className={`w-6 h-6 shrink-0 rounded-full flex items-center justify-center text-xs ${step === "payment" ? "bg-stone-900 text-white" : "bg-stone-200 text-stone-500"}`}>2</span>
               Payment
             </button>
           </div>
@@ -372,9 +372,9 @@ export default function CheckoutClient() {
                         setFormError("Please fill out all required shipping details first.");
                       }
                     }} 
-                    className="btn-primary py-3.5 px-8 text-base"
+                    className="btn-primary w-full sm:w-auto py-3.5 px-6 sm:px-8 text-sm sm:text-base justify-center"
                   >
-                    Continue to Payment <ChevronRight size={18} />
+                    Continue <span className="hidden sm:inline">to Payment</span> <ChevronRight size={18} />
                   </button>
                 </div>
               </div>
@@ -538,7 +538,7 @@ export default function CheckoutClient() {
                     type="submit" 
                     form="checkout-form" 
                     disabled={isSubmitting}
-                    className="btn-primary py-4 px-10 text-base shadow-lg shadow-forest-600/20 flex items-center gap-2"
+                    className="btn-primary py-3 sm:py-4 px-4 sm:px-10 text-sm sm:text-base shadow-lg shadow-forest-600/20 flex items-center justify-center gap-2 w-full sm:w-auto"
                   >
                     {isSubmitting ? "Placing Order..." : `Pay ₹${finalTotal} & Place Order`}
                   </button>
@@ -551,13 +551,13 @@ export default function CheckoutClient() {
         {/* Order Summary */}
         <div className="lg:col-span-5 xl:col-span-4">
           <div className="rounded-2xl border sticky top-24 overflow-hidden" style={{ background: "white", borderColor: "var(--color-stone-200)" }}>
-            <div className="p-6 border-b bg-stone-50/50" style={{ borderColor: "var(--color-stone-200)" }}>
+            <div className="p-4 sm:p-6 border-b bg-stone-50/50" style={{ borderColor: "var(--color-stone-200)" }}>
               <h3 className="text-lg font-bold" style={{ fontFamily: "var(--font-heading)", color: "var(--color-stone-900)" }}>
                 Order Summary
               </h3>
             </div>
             
-            <div className="p-6 space-y-6 max-h-[45vh] overflow-y-auto">
+            <div className="p-4 sm:p-6 space-y-4 sm:space-y-6 max-h-[45vh] overflow-y-auto">
               {items.map((item) => (
                 <div key={`${item.slug}-${item.size}`} className="flex gap-4">
                   <div className="w-16 h-16 rounded-lg shrink-0 flex items-center justify-center border" style={{ background: "var(--color-cream-100)", borderColor: "var(--color-stone-100)" }}>
@@ -575,7 +575,7 @@ export default function CheckoutClient() {
             </div>
 
             {/* Promo Code & Coupon section */}
-            <div className="p-6 border-t space-y-4" style={{ borderColor: "var(--color-stone-200)" }}>
+            <div className="p-4 sm:p-6 border-t space-y-4" style={{ borderColor: "var(--color-stone-200)" }}>
               <div>
                 <label className="block text-xs font-bold uppercase tracking-wider mb-2" style={{ color: "var(--color-stone-500)" }}>
                   Promo / Coupon Code
@@ -728,7 +728,7 @@ export default function CheckoutClient() {
               </div>
             </div>
 
-            <div className="p-6 border-t bg-stone-50/50 space-y-4" style={{ borderColor: "var(--color-stone-200)" }}>
+            <div className="p-4 sm:p-6 border-t bg-stone-50/50 space-y-4" style={{ borderColor: "var(--color-stone-200)" }}>
               <div className="flex justify-between text-sm">
                 <span className="text-stone-500">Subtotal ({totalItems} items)</span>
                 <span className="font-bold text-stone-800">₹{totalPrice}</span>

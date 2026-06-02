@@ -53,7 +53,7 @@ export default function ContactForm() {
       }}
       className="space-y-6"
     >
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
         <div>
           <label
             htmlFor="contact-name"
@@ -168,7 +168,7 @@ export default function ContactForm() {
         />
       </div>
 
-      <button type="submit" className="btn-primary w-full sm:w-auto justify-center py-4 px-10 text-base">
+      <button type="submit" className="btn-primary w-full sm:w-auto justify-center py-3 sm:py-4 px-10 text-base">
         <Send size={18} />
         Send Message
       </button>

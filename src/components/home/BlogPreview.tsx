@@ -50,7 +50,7 @@ export default function BlogPreview() {
           </div>
           <a
             href="/blog"
-            className="btn-secondary text-sm shrink-0"
+            className="btn-secondary text-sm shrink-0 w-full sm:w-auto justify-center"
           >
             View All Articles
             <ArrowRight size={16} />

@@ -108,11 +108,11 @@ export default function CartDrawer() {
               </button>
             </div>
           ) : (
-            <div className="p-5 space-y-4">
+            <div className="p-4 sm:p-5 space-y-3 sm:space-y-4">
               {items.map((item) => (
                 <div
                   key={`${item.slug}-${item.size}`}
-                  className="flex gap-4 p-4 rounded-xl"
+                  className="flex gap-3 sm:gap-4 p-3 sm:p-4 rounded-xl"
                   style={{
                     background: "white",
                     border: "1px solid var(--color-stone-200)",

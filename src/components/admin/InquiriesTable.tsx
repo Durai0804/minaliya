@@ -37,7 +37,7 @@ export default function InquiriesTable({ inquiries }: InquiriesTableProps) {
     >
       <div className="overflow-x-auto">
         {inquiries.length > 0 ? (
-          <table className="w-full text-left border-collapse text-sm">
+          <table className="w-full text-left border-collapse text-sm whitespace-nowrap min-w-[800px]">
             <thead>
               <tr
                 className="border-b text-stone-500 font-semibold"

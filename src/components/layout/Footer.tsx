@@ -63,11 +63,11 @@ export default function Footer() {
                 Get health tips, recipes, and exclusive offers in your inbox.
               </p>
             </div>
-            <form className="flex gap-3 w-full md:w-auto" onSubmit={(e) => e.preventDefault()}>
+            <form className="flex flex-col sm:flex-row gap-3 w-full md:w-auto" onSubmit={(e) => e.preventDefault()}>
               <input
                 type="email"
                 placeholder="Enter your email"
-                className="flex-1 md:w-72 px-5 py-3 rounded-full text-sm outline-none"
+                className="w-full sm:flex-1 md:w-72 px-5 py-3 rounded-full text-sm outline-none"
                 style={{
                   background: "rgba(255, 255, 255, 0.2)",
                   color: "white",
@@ -77,7 +77,7 @@ export default function Footer() {
               />
               <button
                 type="submit"
-                className="px-6 py-3 rounded-full text-sm font-semibold transition-all hover:opacity-90 shrink-0"
+                className="w-full sm:w-auto px-6 py-3 rounded-full text-sm font-semibold transition-all hover:opacity-90 shrink-0"
                 style={{
                   background: "white",
                   color: "var(--color-amber-600)",

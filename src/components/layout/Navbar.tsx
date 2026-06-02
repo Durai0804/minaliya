@@ -200,7 +200,7 @@ export default function Navbar() {
         {/* Search Bar Overlay */}
         {searchOpen && (
           <div
-            className="border-t px-4 py-6 animate-fade-in"
+            className="border-t px-4 py-4 sm:py-6 animate-fade-in"
             style={{
               borderColor: "rgba(255, 255, 255, 0.1)",
               background: "rgba(219, 86, 86, 0.98)",
@@ -217,7 +217,7 @@ export default function Navbar() {
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="Search for cold pressed oils (e.g. coconut, groundnut)..."
-                  className="w-full pl-14 pr-12 py-4 rounded-2xl border-0 text-base outline-none focus:ring-2 focus:ring-white/20 transition-all placeholder:text-white/50"
+                  className="w-full pl-11 sm:pl-14 pr-11 sm:pr-12 py-3 sm:py-4 rounded-2xl border-0 text-sm sm:text-base outline-none focus:ring-2 focus:ring-white/20 transition-all placeholder:text-white/50"
                   style={{
                     background: "rgba(255, 255, 255, 0.1)",
                     color: "white",
@@ -253,29 +253,31 @@ export default function Navbar() {
                             setSearchOpen(false);
                             setSearchQuery("");
                           }}
-                          className="flex items-center gap-4 p-4 hover:bg-stone-50 transition-colors group"
+                          className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4 p-3 sm:p-4 hover:bg-stone-50 transition-colors group"
                         >
-                          <div 
-                            className="w-12 h-12 rounded-lg flex items-center justify-center shrink-0"
-                            style={{ background: "var(--color-cream-100)" }}
-                          >
-                            <Image 
-                              src={product.image} 
-                              alt={product.name} 
-                              width={40} 
-                              height={40} 
-                              className="object-contain"
-                            />
+                          <div className="flex items-center gap-3 w-full sm:w-auto flex-1">
+                            <div 
+                              className="w-12 h-12 rounded-lg flex items-center justify-center shrink-0"
+                              style={{ background: "var(--color-cream-100)" }}
+                            >
+                              <Image 
+                                src={product.image} 
+                                alt={product.name} 
+                                width={40} 
+                                height={40} 
+                                className="object-contain"
+                              />
+                            </div>
+                            <div className="flex-1">
+                              <h4 className="text-sm font-bold text-stone-800 group-hover:text-forest-700 transition-colors">
+                                {product.name}
+                              </h4>
+                              <p className="text-xs text-stone-400">{product.category} • {product.sizes[0]}</p>
+                            </div>
                           </div>
-                          <div className="flex-1">
-                            <h4 className="text-sm font-bold text-stone-800 group-hover:text-forest-700 transition-colors">
-                              {product.name}
-                            </h4>
-                            <p className="text-xs text-stone-400">{product.category} • {product.sizes[0]}</p>
-                          </div>
-                          <div className="text-right">
+                          <div className="flex items-center justify-between sm:justify-end w-full sm:w-auto text-left sm:text-right mt-1 sm:mt-0">
                             <p className="text-sm font-bold text-stone-900">₹{product.price}</p>
-                            <ChevronRight size={14} className="ml-auto text-stone-300" />
+                            <ChevronRight size={14} className="sm:ml-3 text-stone-300" />
                           </div>
                         </Link>
                       ))}

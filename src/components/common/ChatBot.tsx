@@ -48,12 +48,12 @@ export default function ChatBot() {
 
       {/* ── Floating WhatsApp Button & Tooltip ── */}
       <div 
-        className="fixed bottom-6 right-6 z-[100] flex items-center gap-3 select-none pointer-events-none"
+        className="fixed bottom-4 sm:bottom-6 right-4 sm:right-6 z-[100] flex items-center gap-3 select-none pointer-events-none"
         style={{ fontFamily: "var(--font-body, sans-serif)" }}
       >
         {/* Beautiful premium tooltip */}
         <div
-          className={`px-4 py-2.5 rounded-2xl bg-white border border-stone-200 text-stone-800 text-xs sm:text-sm font-semibold shadow-xl flex items-center gap-2 pointer-events-auto transition-all duration-500 origin-right ${
+          className={`px-4 py-2.5 rounded-2xl bg-white border border-stone-200 text-stone-800 text-xs sm:text-sm font-semibold shadow-xl flex items-center gap-2 pointer-events-auto transition-all duration-500 origin-right max-w-[200px] sm:max-w-none ${
             showTooltip 
               ? "opacity-100 translate-x-0 scale-100" 
               : "opacity-0 translate-x-4 scale-95 pointer-events-none"

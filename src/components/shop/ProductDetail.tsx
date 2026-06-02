@@ -139,7 +139,7 @@ export default function ProductDetail({
               </div>
 
               {/* Thumbnails */}
-              <div className="flex gap-3">
+              <div className="flex gap-3 overflow-x-auto pb-2 -mx-4 px-4 sm:mx-0 sm:px-0 sm:pb-0">
                 {product.images.map((img, i) => (
                   <button
                     key={i}
@@ -265,12 +265,12 @@ export default function ProductDetail({
                 >
                   Size
                 </label>
-                <div className="flex gap-3">
+                <div className="flex flex-wrap gap-2 sm:gap-3">
                   {product.sizes.map((size, i) => (
                     <button
                       key={size.label}
                       onClick={() => setSelectedSize(i)}
-                      className="px-6 py-3 rounded-xl text-sm font-medium transition-all"
+                      className="px-4 sm:px-6 py-2.5 sm:py-3 rounded-xl text-xs sm:text-sm font-medium transition-all"
                       style={{
                         background:
                           selectedSize === i
@@ -372,7 +372,7 @@ export default function ProductDetail({
 
               {/* Trust Badges */}
               <div
-                className="grid grid-cols-3 gap-3 pt-4"
+                className="grid grid-cols-3 gap-2 sm:gap-3 pt-4"
               >
                 {[
                   { icon: <Truck size={18} />, label: "Free Shipping", sub: "Above ₹499" },
@@ -381,7 +381,7 @@ export default function ProductDetail({
                 ].map((badge) => (
                   <div
                     key={badge.label}
-                    className="text-center p-3 rounded-xl"
+                    className="text-center p-2 sm:p-3 rounded-xl"
                     style={{
                       background: "var(--color-cream-100)",
                       border: "1px solid var(--color-stone-200)",
@@ -556,14 +556,14 @@ export default function ProductDetail({
             <div className="divider-leaf mx-auto" />
             <h2 className="section-title">You May Also Like</h2>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6">
             {related.map((item) => (
               <Link
                 key={item.slug}
                 href={`/shop/${item.slug}`}
                 className="product-card group block"
               >
-                <div className="product-image relative aspect-[3/4] p-6 flex items-center justify-center">
+                <div className="product-image relative aspect-[3/4] p-3 sm:p-6 flex items-center justify-center">
                   <Image
                     src={item.images[0]}
                     alt={item.name}
@@ -573,12 +573,13 @@ export default function ProductDetail({
                     loading="lazy"
                   />
                 </div>
-                <div className="p-5 space-y-2">
+                <div className="p-3 sm:p-5 space-y-2">
                   <div className="flex gap-0.5">
                     {[...Array(5)].map((_, i) => (
                       <Star
                         key={i}
-                        size={13}
+                        size={12}
+                        className="sm:w-[13px] sm:h-[13px]"
                         fill={
                           i < Math.floor(item.rating)
                             ? "var(--color-amber-400)"
@@ -593,7 +594,7 @@ export default function ProductDetail({
                     ))}
                   </div>
                   <h3
-                    className="text-base font-semibold"
+                    className="text-sm sm:text-base font-semibold line-clamp-2"
                     style={{
                       fontFamily: "var(--font-heading)",
                       color: "var(--color-stone-800)",
@@ -601,15 +602,15 @@ export default function ProductDetail({
                   >
                     {item.name}
                   </h3>
-                  <div className="flex items-baseline gap-2">
+                  <div className="flex flex-col sm:flex-row sm:items-baseline gap-1 sm:gap-2">
                     <span
-                      className="text-lg font-bold"
+                      className="text-base sm:text-lg font-bold"
                       style={{ color: "var(--color-stone-800)" }}
                     >
                       ₹{item.price}
                     </span>
                     <span
-                      className="text-sm line-through"
+                      className="text-xs sm:text-sm line-through"
                       style={{ color: "var(--color-stone-400)" }}
                     >
                       ₹{item.originalPrice}

@@ -29,7 +29,7 @@ export default function TrustSection() {
   return (
     <section
       id="about-minaliya"
-      className="relative py-24 lg:py-32 overflow-hidden"
+      className="relative py-16 sm:py-24 lg:py-32 overflow-hidden"
       style={{ background: "var(--color-cream-50)" }}
     >
       {/* Decorative background element */}
@@ -71,7 +71,7 @@ export default function TrustSection() {
               </div>
               
               <h2 
-                className="text-4xl sm:text-5xl lg:text-6xl leading-[1.1] text-stone-900"
+                className="text-3xl sm:text-5xl lg:text-6xl leading-[1.1] text-stone-900"
                 style={{ fontFamily: "var(--font-display)" }}
               >
                 Minaliya Wooden <br />
@@ -96,7 +96,7 @@ export default function TrustSection() {
                 <div className="h-px flex-1 bg-stone-200" />
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-10 gap-y-8">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-10 gap-y-6 sm:gap-y-8">
                 {benefits.map((benefit) => (
                   <div key={benefit.id} className="space-y-2 group">
                     <div className="flex items-center gap-3">
@@ -120,7 +120,7 @@ export default function TrustSection() {
             <div className="pt-4">
               <Link
                 href="/about"
-                className="inline-flex items-center gap-3 px-10 py-4 rounded-full bg-stone-900 text-cream-50 font-semibold text-sm hover:bg-stone-800 transition-all hover:gap-5 group"
+                className="inline-flex items-center justify-center gap-3 px-10 py-4 rounded-full bg-stone-900 text-cream-50 font-semibold text-sm hover:bg-stone-800 transition-all hover:gap-5 group w-full sm:w-auto"
               >
                 Know More
                 <ArrowRight size={18} className="transition-all" />

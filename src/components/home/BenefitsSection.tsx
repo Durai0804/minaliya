@@ -90,11 +90,11 @@ export default function BenefitsSection() {
         </div>
 
         {/* Benefits Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6">
+        <div className="flex sm:grid sm:grid-cols-2 lg:grid-cols-5 gap-4 sm:gap-6 overflow-x-auto pb-6 sm:pb-0 -mx-4 px-4 sm:mx-0 sm:px-0 snap-x snap-mandatory hide-scrollbar">
           {benefits.map((item, i) => (
             <div
               key={i}
-              className="text-center p-6 rounded-2xl transition-all duration-300 hover:scale-[1.02]"
+              className="text-center p-6 rounded-2xl transition-all duration-300 hover:scale-[1.02] shrink-0 w-[260px] sm:w-auto snap-center"
               style={{
                 background: "rgba(255, 255, 255, 0.06)",
                 border: "1px solid rgba(255, 255, 255, 0.1)",
