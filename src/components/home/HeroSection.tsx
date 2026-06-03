@@ -393,13 +393,13 @@ export default function HeroSection() {
                 className="relative z-10"
               >
                 {/* ── Product bottle ── */}
-                <div className="w-[220px] sm:w-[240px] md:w-[280px] lg:w-[290px] xl:w-[280px] hero-animate-float relative mx-auto lg:mx-0">
+                <div className="w-[220px] sm:w-[280px] md:w-[320px] lg:w-[360px] xl:w-[400px] h-[45vh] md:h-[55vh] lg:h-[65vh] max-h-[600px] min-h-[350px] hero-animate-float relative mx-auto lg:mx-0 flex justify-center">
                   <Image
                     src={slide.image}
                     alt={slide.imageAlt}
-                    width={450}
-                    height={675}
-                    className="w-full h-auto object-contain relative z-10"
+                    fill
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                    className="object-contain relative z-10"
                     style={{
                       filter: "drop-shadow(0 20px 30px rgba(0, 0, 0, 0.12))",
                     }}
@@ -408,7 +408,7 @@ export default function HeroSection() {
 
                   {/* Reflection beneath bottle */}
                   <div
-                    className="absolute bottom-[-8%] left-[5%] right-[5%] h-[30%] z-0 overflow-hidden"
+                    className="absolute bottom-[-15%] left-[5%] right-[5%] h-[30%] z-0 overflow-hidden"
                     style={{
                       transform: "scaleY(-1) scaleX(0.92)",
                       opacity: 0.08,
@@ -419,15 +419,17 @@ export default function HeroSection() {
                     }}
                     aria-hidden="true"
                   >
-                    <Image
-                      src={slide.image}
-                      alt=""
-                      width={450}
-                      height={675}
-                      className="w-full h-auto object-contain"
-                      quality={50}
-                      aria-hidden="true"
-                    />
+                    <div className="relative w-full h-full">
+                      <Image
+                        src={slide.image}
+                        alt=""
+                        fill
+                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                        className="object-contain"
+                        quality={50}
+                        aria-hidden="true"
+                      />
+                    </div>
                   </div>
                 </div>
 
@@ -470,7 +472,7 @@ export default function HeroSection() {
 
                 {/* ── Bottom badge ── */}
                 <div
-                  className="absolute -bottom-4 left-1/2 -translate-x-1/2 hero-animate-float-slow hidden sm:block"
+                  className="absolute -bottom-10 lg:-bottom-12 left-1/2 -translate-x-1/2 hero-animate-float-slow hidden sm:block z-20"
                   style={{ animationDelay: "1s" }}
                 >
                   <div
