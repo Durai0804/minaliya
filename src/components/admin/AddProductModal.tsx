@@ -377,7 +377,7 @@ export default function AddProductModal({ categories }: AddProductModalProps) {
 
                 {/* Previews */}
                 {imagePreviews.length > 0 && (
-                  <div className="grid grid-cols-4 gap-3 mt-3">
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-3">
                     {imagePreviews.map((preview, i) => (
                       <div
                         key={i}

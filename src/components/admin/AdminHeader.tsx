@@ -33,7 +33,7 @@ export default function AdminHeader({ onMenuToggle, title }: AdminHeaderProps) {
         </button>
 
         <h1
-          className="text-lg font-bold tracking-wide"
+          className="text-sm sm:text-lg font-bold tracking-wide truncate max-w-[180px] sm:max-w-none"
           style={{ fontFamily: "var(--font-heading)", color: "var(--color-stone-800)" }}
         >
           {title}

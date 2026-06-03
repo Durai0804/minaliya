@@ -120,7 +120,7 @@ export default async function AdminDashboardPage() {
 
           <div className="overflow-x-auto">
             {recentOrders.length > 0 ? (
-              <table className="w-full text-left border-collapse text-sm">
+              <table className="w-full text-left border-collapse text-sm min-w-[600px]">
                 <thead>
                   <tr
                     className="border-b text-stone-500 font-semibold"

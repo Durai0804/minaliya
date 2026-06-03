@@ -42,7 +42,7 @@ export default async function AdminProductsPage() {
   return (
     <div className="space-y-6">
       {/* Header section */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h2 className="text-xl font-bold text-stone-900" style={{ fontFamily: "var(--font-heading)" }}>
             Product Inventory
@@ -51,9 +51,9 @@ export default async function AdminProductsPage() {
             Check active oil variants in database records, monitor remaining quantities, and review prices.
           </p>
         </div>
-        <div className="flex items-center gap-3">
-          <div className="px-3 py-1 text-xs font-semibold rounded-full bg-forest-50 text-forest-700 border border-forest-200 shadow-sm">
-            {products.length} Products Defined
+        <div className="flex items-center gap-3 shrink-0">
+          <div className="px-3 py-1 text-xs font-semibold rounded-full bg-forest-50 text-forest-700 border border-forest-200 shadow-sm whitespace-nowrap">
+            {products.length} Products
           </div>
           <AddProductModal categories={categories} />
         </div>
@@ -70,7 +70,7 @@ export default async function AdminProductsPage() {
       >
         <div className="overflow-x-auto">
           {products.length > 0 ? (
-            <table className="w-full text-left border-collapse text-sm">
+            <table className="w-full text-left border-collapse text-sm min-w-[650px]">
               <thead>
                 <tr
                   className="border-b font-semibold"
