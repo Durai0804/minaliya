@@ -80,7 +80,7 @@ export default function WhyColdPressed() {
         <div className="max-w-3xl mx-auto mb-20">
           <div className="overflow-x-auto pb-2 -mx-4 px-4 sm:mx-0 sm:px-0">
             <div
-              className="rounded-2xl overflow-hidden shadow-sm min-w-[500px]"
+              className="rounded-2xl overflow-hidden shadow-sm min-w-[380px] sm:min-w-0"
               style={{ border: "1px solid var(--color-stone-200)" }}
             >
               {/* Table Header */}
