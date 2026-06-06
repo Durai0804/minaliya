@@ -46,7 +46,8 @@ export default function AdminHeader({ onMenuToggle, title }: AdminHeaderProps) {
           href="/"
           target="_blank"
           rel="noopener noreferrer"
-          className="hidden sm:flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-semibold transition-all duration-200"
+          aria-label="Visit storefront"
+          className="flex items-center gap-1.5 px-3 sm:px-4 py-2 rounded-xl text-xs font-semibold transition-all duration-200"
           style={{
             color: "var(--color-forest-700)",
             background: "var(--color-forest-50)",
@@ -64,7 +65,7 @@ export default function AdminHeader({ onMenuToggle, title }: AdminHeaderProps) {
           }}
         >
           <ExternalLink size={12} />
-          Visit Store
+          <span className="hidden sm:inline">Visit Store</span>
         </Link>
 
         {/* Status Indicator */}

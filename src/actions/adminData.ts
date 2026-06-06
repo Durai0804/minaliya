@@ -23,26 +23,69 @@ async function requireAdmin() {
   }
 }
 
+function getMonthBounds(offsetMonths = 0) {
+  const now = new Date();
+  const start = new Date(now.getFullYear(), now.getMonth() - offsetMonths, 1);
+  const end = new Date(now.getFullYear(), now.getMonth() - offsetMonths + 1, 1);
+  return { start, end };
+}
+
+function percentChange(current: number, previous: number): number | null {
+  if (previous === 0) return current > 0 ? 100 : null;
+  return Math.round(((current - previous) / previous) * 100);
+}
+
 export async function getAdminDashboardStats() {
   await requireAdmin();
 
-  const [totalOrders, totalProducts, totalInquiries, orders] =
-    await Promise.all([
-      prisma.order.count(),
-      prisma.product.count(),
-      prisma.bulkInquiry.count(),
-      prisma.order.findMany({
-        select: { totalAmount: true, status: true },
-      }),
-    ]);
+  const thisMonth = getMonthBounds(0);
+  const lastMonth = getMonthBounds(1);
 
-  const totalRevenue = orders.reduce(
-    (sum: number, order: any) => sum + Number(order.totalAmount),
-    0
-  );
-  const pendingOrders = orders.filter(
-    (order: any) => order.status === "PENDING" || order.status === "PROCESSING"
-  ).length;
+  const [
+    totalOrders,
+    totalProducts,
+    totalInquiries,
+    revenueAgg,
+    pendingOrders,
+    inStockCount,
+    ordersThisMonth,
+    ordersLastMonth,
+    revenueThisMonthAgg,
+    revenueLastMonthAgg,
+  ] = await Promise.all([
+    prisma.order.count(),
+    prisma.product.count(),
+    prisma.bulkInquiry.count(),
+    prisma.order.aggregate({ _sum: { totalAmount: true } }),
+    prisma.order.count({
+      where: { status: { in: ["PENDING", "PROCESSING"] } },
+    }),
+    prisma.product.count({ where: { stock: { gt: 0 } } }),
+    prisma.order.count({
+      where: { createdAt: { gte: thisMonth.start, lt: thisMonth.end } },
+    }),
+    prisma.order.count({
+      where: { createdAt: { gte: lastMonth.start, lt: lastMonth.end } },
+    }),
+    prisma.order.aggregate({
+      where: { createdAt: { gte: thisMonth.start, lt: thisMonth.end } },
+      _sum: { totalAmount: true },
+    }),
+    prisma.order.aggregate({
+      where: { createdAt: { gte: lastMonth.start, lt: lastMonth.end } },
+      _sum: { totalAmount: true },
+    }),
+  ]);
+
+  const totalRevenue = Number(revenueAgg._sum.totalAmount ?? 0);
+  const revenueThisMonth = Number(revenueThisMonthAgg._sum.totalAmount ?? 0);
+  const revenueLastMonth = Number(revenueLastMonthAgg._sum.totalAmount ?? 0);
+
+  const ordersTrend = percentChange(ordersThisMonth, ordersLastMonth);
+  const revenueTrend = percentChange(revenueThisMonth, revenueLastMonth);
+
+  const stockPercent =
+    totalProducts > 0 ? Math.round((inStockCount / totalProducts) * 100) : 0;
 
   return {
     totalOrders,
@@ -50,6 +93,9 @@ export async function getAdminDashboardStats() {
     totalInquiries,
     totalRevenue,
     pendingOrders,
+    stockPercent,
+    ordersTrend,
+    revenueTrend,
   };
 }
 

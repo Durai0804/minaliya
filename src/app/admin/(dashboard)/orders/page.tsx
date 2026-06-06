@@ -3,8 +3,14 @@ import OrdersTable from "@/components/admin/OrdersTable";
 
 export const revalidate = 0; // Disable static rendering for admin data pages
 
-export default async function AdminOrdersPage() {
+export default async function AdminOrdersPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ status?: string }>;
+}) {
+  const params = await searchParams;
   const orders = await getAllOrders();
+  const initialFilter = params.status === "active" ? "active" : "all";
 
   return (
     <div className="space-y-6">
@@ -24,7 +30,7 @@ export default async function AdminOrdersPage() {
       </div>
 
       {/* Orders Table Wrapper */}
-      <OrdersTable initialOrders={orders} />
+      <OrdersTable initialOrders={orders} initialFilter={initialFilter} />
     </div>
   );
 }

@@ -28,14 +28,35 @@ interface Order {
   items: OrderItem[];
 }
 
+type OrderFilter = "all" | "active";
+
 interface OrdersTableProps {
   initialOrders: Order[];
+  initialFilter?: OrderFilter;
 }
 
-export default function OrdersTable({ initialOrders }: OrdersTableProps) {
+const ACTIVE_STATUSES = new Set(["PENDING", "PROCESSING"]);
+
+export default function OrdersTable({
+  initialOrders,
+  initialFilter = "all",
+}: OrdersTableProps) {
   const [orders, setOrders] = useState<Order[]>(initialOrders);
+  const [filter, setFilter] = useState<OrderFilter>(initialFilter);
   const [expandedOrders, setExpandedOrders] = useState<Record<string, boolean>>({});
   const [updatingId, setUpdatingId] = useState<string | null>(null);
+
+  const filteredOrders =
+    filter === "active"
+      ? orders.filter((o) => ACTIVE_STATUSES.has(o.status))
+      : orders;
+
+  const formatDate = (iso: string) =>
+    new Date(iso).toLocaleDateString("en-IN", {
+      day: "numeric",
+      month: "short",
+      year: "numeric",
+    });
 
   const toggleExpand = (id: string) => {
     setExpandedOrders((prev) => ({ ...prev, [id]: !prev[id] }));
@@ -61,6 +82,86 @@ export default function OrdersTable({ initialOrders }: OrdersTableProps) {
     }
   };
 
+  const renderExpandedDetails = (order: Order) => (
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
+      <div>
+        <h4 className="text-xs font-bold uppercase text-stone-500 tracking-wider mb-4 flex items-center gap-2">
+          <CheckCircle size={14} style={{ color: "var(--color-forest-600)" }} />
+          Order Items ({order.items.length})
+        </h4>
+        <div className="space-y-3">
+          {order.items.map((item) => (
+            <div
+              key={item.id}
+              className="flex items-center justify-between p-3 rounded-xl bg-white border border-stone-200 shadow-sm"
+            >
+              <div className="flex items-center gap-3">
+                <div className="relative w-10 h-10 rounded-lg overflow-hidden bg-stone-50 flex items-center justify-center shrink-0 border border-stone-200">
+                  <Image
+                    src={item.productImage}
+                    alt={item.productName}
+                    fill
+                    sizes="40px"
+                    className="object-contain"
+                  />
+                </div>
+                <div>
+                  <h5 className="font-semibold text-stone-900 text-xs">{item.productName}</h5>
+                  <p className="text-[10px] text-stone-500 mt-0.5">₹{item.price} each</p>
+                </div>
+              </div>
+              <div className="text-right">
+                <span className="text-xs font-bold text-stone-500">Qty: {item.quantity}</span>
+                <p className="text-xs font-bold text-stone-900 mt-0.5">
+                  ₹{item.price * item.quantity}
+                </p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+      <div>
+        <h4 className="text-xs font-bold uppercase text-stone-500 tracking-wider mb-4 flex items-center gap-2">
+          <MapPin size={14} style={{ color: "var(--color-forest-600)" }} />
+          Shipping & Customer Details
+        </h4>
+        <div className="p-4 rounded-xl bg-white border border-stone-200 space-y-3.5 text-xs text-stone-600 shadow-sm">
+          <div className="flex items-start gap-2">
+            <span className="font-bold text-stone-500 shrink-0 w-16">Customer:</span>
+            <div>
+              <p className="font-semibold text-stone-900">{order.customerName}</p>
+              <div className="flex items-center gap-1.5 text-stone-500 mt-1">
+                <Phone size={12} />
+                {order.customerPhone}
+              </div>
+              {order.customerEmail && order.customerEmail !== "N/A" && (
+                <div className="flex items-center gap-1.5 text-stone-500 mt-1">
+                  <Mail size={12} />
+                  {order.customerEmail}
+                </div>
+              )}
+            </div>
+          </div>
+          <div
+            className="flex items-start gap-2 border-t pt-3"
+            style={{ borderColor: "var(--color-stone-200)" }}
+          >
+            <span className="font-bold text-stone-500 shrink-0 w-16">Address:</span>
+            <div className="space-y-1">
+              <p className="text-stone-800 leading-relaxed font-medium">
+                {order.shippingAddress?.address}
+              </p>
+              <p className="text-stone-500">
+                {order.shippingAddress?.city}, {order.shippingAddress?.state} -{" "}
+                {order.shippingAddress?.pinCode}
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
   return (
     <div
       className="rounded-2xl border overflow-hidden"
@@ -70,9 +171,99 @@ export default function OrdersTable({ initialOrders }: OrdersTableProps) {
         boxShadow: "var(--shadow-card)",
       }}
     >
-      <div className="overflow-x-auto">
-        {orders.length > 0 ? (
-          <table className="w-full text-left border-collapse text-sm whitespace-nowrap min-w-[800px]">
+      {/* Filter tabs */}
+      <div
+        className="flex flex-wrap gap-2 p-4 border-b"
+        style={{ borderColor: "var(--color-stone-100)" }}
+      >
+        {(
+          [
+            { id: "all" as const, label: "All Orders" },
+            { id: "active" as const, label: "Pending / Processing" },
+          ] as const
+        ).map((tab) => (
+          <button
+            key={tab.id}
+            type="button"
+            onClick={() => setFilter(tab.id)}
+            className="px-3 py-1.5 rounded-full text-xs font-semibold transition-colors"
+            style={{
+              background: filter === tab.id ? "var(--color-forest-600)" : "var(--color-stone-100)",
+              color: filter === tab.id ? "white" : "var(--color-stone-600)",
+            }}
+          >
+            {tab.label}
+            <span className="ml-1 opacity-80">
+              (
+              {tab.id === "all"
+                ? orders.length
+                : orders.filter((o) => ACTIVE_STATUSES.has(o.status)).length}
+              )
+            </span>
+          </button>
+        ))}
+      </div>
+
+      {filteredOrders.length > 0 ? (
+        <>
+          {/* Mobile cards */}
+          <div className="md:hidden divide-y" style={{ borderColor: "var(--color-stone-100)" }}>
+            {filteredOrders.map((order) => {
+              const isExpanded = !!expandedOrders[order.id];
+              const isUpdating = updatingId === order.id;
+              return (
+                <div key={order.id} className="p-4">
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="min-w-0">
+                      <p className="font-mono text-xs text-stone-500">
+                        #{order.id.slice(-8).toUpperCase()}
+                      </p>
+                      <p className="font-semibold text-stone-900 text-sm mt-0.5">
+                        {order.customerName}
+                      </p>
+                      <p className="text-xs text-stone-500 mt-1">{formatDate(order.createdAt)}</p>
+                    </div>
+                    <div className="text-right shrink-0">
+                      <p className="font-bold text-stone-900">₹{order.totalAmount}</p>
+                      <div className="mt-1.5">
+                        {isUpdating ? (
+                          <Loader2 size={14} className="animate-spin text-stone-400 ml-auto" />
+                        ) : (
+                          <OrderStatusBadge status={order.status} />
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2 mt-3">
+                    <select
+                      value={order.status}
+                      disabled={isUpdating}
+                      onChange={(e) => handleStatusChange(order.id, e.target.value)}
+                      className="flex-1 px-2.5 py-2 rounded-xl text-xs bg-white text-stone-700 border border-stone-200 outline-none"
+                    >
+                      <option value="PENDING">Pending</option>
+                      <option value="PROCESSING">Processing</option>
+                      <option value="SHIPPED">Shipped</option>
+                      <option value="DELIVERED">Delivered</option>
+                      <option value="CANCELLED">Cancelled</option>
+                    </select>
+                    <button
+                      type="button"
+                      onClick={() => toggleExpand(order.id)}
+                      className="p-2 rounded-lg border border-stone-200 text-stone-500"
+                    >
+                      {isExpanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+                    </button>
+                  </div>
+                  {isExpanded && <div className="mt-4">{renderExpandedDetails(order)}</div>}
+                </div>
+              );
+            })}
+          </div>
+
+          {/* Desktop table */}
+          <div className="hidden md:block overflow-x-auto">
+          <table className="w-full text-left border-collapse text-sm">
             <thead>
               <tr
                 className="border-b text-stone-500 font-semibold"
@@ -92,7 +283,7 @@ export default function OrdersTable({ initialOrders }: OrdersTableProps) {
               </tr>
             </thead>
             <tbody className="divide-y" style={{ borderColor: "var(--color-stone-200)" }}>
-              {orders.map((order) => {
+              {filteredOrders.map((order) => {
                 const isExpanded = !!expandedOrders[order.id];
                 const isUpdating = updatingId === order.id;
 
@@ -141,13 +332,7 @@ export default function OrdersTable({ initialOrders }: OrdersTableProps) {
                           <OrderStatusBadge status={order.status} />
                         )}
                       </td>
-                      <td className="p-4 text-stone-500 text-xs">
-                        {new Date(order.createdAt).toLocaleDateString("en-IN", {
-                          day: "numeric",
-                          month: "short",
-                          year: "numeric",
-                        })}
-                      </td>
+                      <td className="p-4 text-stone-500 text-xs">{formatDate(order.createdAt)}</td>
                       <td className="p-4 pr-6 text-right">
                         <select
                           value={order.status}
@@ -167,82 +352,12 @@ export default function OrdersTable({ initialOrders }: OrdersTableProps) {
                     {/* Expanded Details Row */}
                     {isExpanded && (
                       <tr className="bg-stone-50/40">
-                        <td colSpan={8} className="p-6 pl-16 border-b" style={{ borderColor: "var(--color-stone-200)" }}>
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                            {/* Products Section */}
-                            <div>
-                              <h4 className="text-xs font-bold uppercase text-stone-500 tracking-wider mb-4 flex items-center gap-2">
-                                <CheckCircle size={14} style={{ color: "var(--color-forest-600)" }} />
-                                Order Items ({order.items.length})
-                              </h4>
-                              <div className="space-y-3">
-                                {order.items.map((item) => (
-                                  <div
-                                    key={item.id}
-                                    className="flex items-center justify-between p-3 rounded-xl bg-white border border-stone-200 shadow-sm"
-                                  >
-                                    <div className="flex items-center gap-3">
-                                      <div className="relative w-10 h-10 rounded-lg overflow-hidden bg-stone-50 flex items-center justify-center shrink-0 border border-stone-200">
-                                        <Image
-                                          src={item.productImage}
-                                          alt={item.productName}
-                                          fill
-                                          sizes="40px"
-                                          className="object-contain"
-                                        />
-                                      </div>
-                                      <div>
-                                        <h5 className="font-semibold text-stone-900 text-xs">{item.productName}</h5>
-                                        <p className="text-[10px] text-stone-500 mt-0.5">₹{item.price} each</p>
-                                      </div>
-                                    </div>
-                                    <div className="text-right">
-                                      <span className="text-xs font-bold text-stone-500">Qty: {item.quantity}</span>
-                                      <p className="text-xs font-bold text-stone-900 mt-0.5">₹{item.price * item.quantity}</p>
-                                    </div>
-                                  </div>
-                                ))}
-                              </div>
-                            </div>
-
-                            {/* Shipping Details Section */}
-                            <div>
-                              <h4 className="text-xs font-bold uppercase text-stone-500 tracking-wider mb-4 flex items-center gap-2">
-                                <MapPin size={14} style={{ color: "var(--color-forest-600)" }} />
-                                Shipping & Customer Details
-                              </h4>
-                              <div className="p-4 rounded-xl bg-white border border-stone-200 space-y-3.5 text-xs text-stone-600 shadow-sm">
-                                <div className="flex items-start gap-2">
-                                  <span className="font-bold text-stone-500 shrink-0 w-16">Customer:</span>
-                                  <div>
-                                    <p className="font-semibold text-stone-900">{order.customerName}</p>
-                                    <div className="flex items-center gap-1.5 text-stone-500 mt-1">
-                                      <Phone size={12} />
-                                      {order.customerPhone}
-                                    </div>
-                                    {order.customerEmail && order.customerEmail !== "N/A" && (
-                                      <div className="flex items-center gap-1.5 text-stone-500 mt-1">
-                                        <Mail size={12} />
-                                        {order.customerEmail}
-                                      </div>
-                                    )}
-                                  </div>
-                                </div>
-
-                                <div className="flex items-start gap-2 border-t pt-3" style={{ borderColor: "var(--color-stone-200)" }}>
-                                  <span className="font-bold text-stone-500 shrink-0 w-16">Address:</span>
-                                  <div className="space-y-1">
-                                    <p className="text-stone-800 leading-relaxed font-medium">
-                                      {order.shippingAddress?.address}
-                                    </p>
-                                    <p className="text-stone-500">
-                                      {order.shippingAddress?.city}, {order.shippingAddress?.state} - {order.shippingAddress?.pinCode}
-                                    </p>
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
+                        <td
+                          colSpan={8}
+                          className="p-6 pl-8 sm:pl-16 border-b"
+                          style={{ borderColor: "var(--color-stone-200)" }}
+                        >
+                          {renderExpandedDetails(order)}
                         </td>
                       </tr>
                     )}
@@ -251,12 +366,15 @@ export default function OrdersTable({ initialOrders }: OrdersTableProps) {
               })}
             </tbody>
           </table>
-        ) : (
-          <div className="p-12 text-center text-stone-500 font-medium">
-            No customer orders found in the database.
           </div>
-        )}
-      </div>
+        </>
+      ) : (
+        <div className="p-12 text-center text-stone-500 font-medium">
+          {filter === "active"
+            ? "No pending or processing orders right now."
+            : "No customer orders found in the database."}
+        </div>
+      )}
     </div>
   );
 }
