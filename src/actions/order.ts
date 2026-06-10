@@ -74,7 +74,7 @@ export async function createOrder(data: OrderInput) {
           totalAmount: new Prisma.Decimal(data.totalAmount),
           shippingAddress: data.shippingAddress as any,
           paymentMethod: data.paymentMethod.toUpperCase(),
-          paymentStatus: data.paymentMethod.toUpperCase() === "COD" ? "PENDING" : "PAID",
+          paymentStatus: "PAID",
           status: "PENDING",
           items: {
             create: itemsToCreate,

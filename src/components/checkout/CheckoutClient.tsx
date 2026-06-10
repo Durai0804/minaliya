@@ -8,7 +8,16 @@ import { useCart } from "@/context/CartContext";
 import { useOrders } from "@/context/OrderContext";
 import { ChevronRight, Lock, MapPin, CreditCard, CheckCircle2, ShoppingBag, ArrowLeft, AlertCircle, Tag, X, ChevronDown } from "lucide-react";
 import { createOrder } from "@/actions/order";
+import { lookupPincode } from "@/actions/lookupPincode";
 import { useAuth } from "@/context/AuthContext";
+
+const FREE_SHIPPING_STATES = [
+  "Tamil Nadu",
+  "Kerala",
+  "Karnataka",
+  "Telangana",
+  "Andhra Pradesh",
+];
 
 interface Coupon {
   code: string;
@@ -55,14 +64,14 @@ const AVAILABLE_COUPONS: Coupon[] = [
     code: "FREESHIP",
     type: "freeship",
     value: 0,
-    description: "Free shipping on any order value!",
+    description: "Free shipping on your first order!",
   },
 ];
 
 export default function CheckoutClient() {
   const router = useRouter();
   const { items, totalPrice, totalItems, clearCart } = useCart();
-  const { addOrder } = useOrders();
+  const { orders, addOrder } = useOrders();
   const { user, isAuthenticated, isAuthReady, openLoginModal } = useAuth();
 
   // Protect checkout route
@@ -74,9 +83,77 @@ export default function CheckoutClient() {
   }, [isAuthReady, isAuthenticated, openLoginModal, router]);
 
   const [step, setStep] = useState<"shipping" | "payment" | "success">("shipping");
-  const [selectedPayment, setSelectedPayment] = useState<"card" | "upi" | "cod">("card");
+  const [selectedPayment, setSelectedPayment] = useState<"card" | "upi">("card");
   const [selectedUpi, setSelectedUpi] = useState<string | null>(null);
   const [cardData, setCardData] = useState({ number: "", expiry: "", cvc: "" });
+  const [detectedCardType, setDetectedCardType] = useState<string | null>(null);
+
+  const detectCardType = (num: string): string | null => {
+    const n = num.replace(/\D/g, "");
+    if (!n) return null;
+    if (/^4/.test(n)) return "visa";
+    if (/^(5[1-5]|222[1-9]|22[3-9]\d|2[3-6]\d{2}|27[0-1]\d|2720)/.test(n)) return "mastercard";
+    if (/^3[47]/.test(n)) return "amex";
+    if (/^(60|81|82|508|353|356)/.test(n)) return "rupay";
+    return null;
+  };
+
+  const formatCardNumber = (num: string): string => {
+    const n = num.replace(/\D/g, "");
+    if (/^3[47]/.test(n)) {
+      let out = n.slice(0, 4);
+      if (n.length > 4) out += " " + n.slice(4, 10);
+      if (n.length > 10) out += " " + n.slice(10, 15);
+      return out;
+    }
+    return n.replace(/(\d{4})/g, "$1 ").trim();
+  };
+
+  const cardBrandIcons: Record<string, React.ReactNode> = {
+    visa: <i className="fa-brands fa-cc-visa" style={{ fontSize: "40px", color: "#1A1F71" }} />,
+    mastercard: <i className="fa-brands fa-cc-mastercard" style={{ fontSize: "40px", color: "#EB001B" }} />,
+    amex: <i className="fa-brands fa-cc-amex" style={{ fontSize: "40px", color: "#2E77BC" }} />,
+    rupay: (
+      <svg viewBox="0 0 60 38" width="60" height="38" role="img" aria-label="RuPay">
+        <rect width="60" height="38" rx="5" fill="#1a1a2e" />
+        <text x="7" y="22" fontFamily="Arial Black, Arial" fontWeight="900" fontSize="11" fill="#ffffff" letterSpacing="0.5">Ru</text>
+        <text x="22" y="22" fontFamily="Arial Black, Arial" fontWeight="900" fontSize="11" fill="#00b050" letterSpacing="0.5">Pay</text>
+        <rect x="7" y="25" width="46" height="2" rx="1" fill="#00b050" opacity="0.6" />
+        <text x="7" y="34" fontFamily="Arial" fontSize="5.5" fill="#aaaaaa" letterSpacing="1">INDIA'S OWN</text>
+      </svg>
+    ),
+  };
+
+  const upiMethods = [
+    {
+      id: "GPay",
+      label: "Google Pay",
+      icon: <img src="https://cdn.simpleicons.org/googlepay" width="40" height="40" alt="Google Pay" />,
+    },
+    {
+      id: "Razorpay",
+      label: "Razorpay",
+      icon: <img src="https://cdn.simpleicons.org/razorpay" width="40" height="40" alt="Razorpay" />,
+    },
+    {
+      id: "PhonePe",
+      label: "PhonePe",
+      icon: <img src="https://cdn.simpleicons.org/phonepe" width="40" height="40" alt="PhonePe" />,
+    },
+    {
+      id: "Netbanking",
+      label: "Netbanking",
+      icon: (
+        <svg viewBox="0 0 48 48" width="32" height="32" fill="none">
+          <rect x="6" y="20" width="36" height="22" rx="3" stroke="currentColor" strokeWidth="2" fill="none" />
+          <path d="M24 6 6 20h36L24 6z" stroke="currentColor" strokeWidth="2" fill="none" strokeLinejoin="round" />
+          <path d="M18 30h12v8H18z" stroke="currentColor" strokeWidth="1.5" fill="none" />
+          <path d="M14 26h20" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+          <path d="M22 32h4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+        </svg>
+      ),
+    },
+  ];
 
   // Shipping form state
   const [email, setEmail] = useState("");
@@ -86,6 +163,8 @@ export default function CheckoutClient() {
   const [city, setCity] = useState("");
   const [postalCode, setPostalCode] = useState("");
   const [phone, setPhone] = useState("");
+  const [shippingState, setShippingState] = useState("");
+  const [isLookingUpPincode, setIsLookingUpPincode] = useState(false);
   const [formError, setFormError] = useState("");
   const [createdOrderId, setCreatedOrderId] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -115,12 +194,27 @@ export default function CheckoutClient() {
       setCity(defAddr.city);
       setPostalCode(defAddr.zipCode);
       setPhone(defAddr.phone);
+      setShippingState(defAddr.state);
     } else {
       if (user.mobile) setPhone(user.mobile);
     }
     if (user.email) setEmail(user.email);
     setHasAutoSelected(true);
   }, [user]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Debounced pincode lookup
+  useEffect(() => {
+    if (postalCode.trim().length !== 6) return;
+    const timer = setTimeout(async () => {
+      setIsLookingUpPincode(true);
+      const res = await lookupPincode(postalCode.trim());
+      if (res.success && res.state) {
+        setShippingState(FREE_SHIPPING_STATES.includes(res.state) ? res.state : "Other");
+      }
+      setIsLookingUpPincode(false);
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [postalCode]);
 
   // Handler: user picks a saved address card or "new"
   const handleSelectSavedAddress = (id: string | "new") => {
@@ -132,6 +226,7 @@ export default function CheckoutClient() {
       setCity("");
       setPostalCode("");
       setPhone(user?.mobile || "");
+      setShippingState("");
       return;
     }
     const addr = savedAddresses.find((a) => a.id === id);
@@ -143,6 +238,7 @@ export default function CheckoutClient() {
     setCity(addr.city);
     setPostalCode(addr.zipCode);
     setPhone(addr.phone);
+    setShippingState(addr.state);
   };
 
   // Coupon states
@@ -159,9 +255,11 @@ export default function CheckoutClient() {
     discountAmount = Math.round((totalPrice * appliedCoupon.value) / 100);
   }
 
-  // Shipping cost: free if subscription, or order total >= 499, or if FREESHIP coupon is applied
+  // Shipping cost: free if subscription, or order total >= 499, FREESHIP coupon,
+  // or shipping to Tamil Nadu, Kerala, Karnataka, Telangana, or Andhra Pradesh
   const isFreeShipCoupon = appliedCoupon?.type === "freeship";
-  const shippingCost = (totalPrice >= 499 || hasSubscription || isFreeShipCoupon) ? 0 : 50;
+  const isFreeShippingState = FREE_SHIPPING_STATES.includes(shippingState);
+  const shippingCost = (totalPrice >= 499 || hasSubscription || isFreeShipCoupon || isFreeShippingState) ? 0 : 50;
 
   const finalTotal = Math.max(0, totalPrice - discountAmount + shippingCost);
 
@@ -184,6 +282,12 @@ export default function CheckoutClient() {
     // Check minimum order value constraint
     if (coupon.minOrderValue && totalPrice < coupon.minOrderValue) {
       setCouponError(`This coupon requires a minimum order value of ₹${coupon.minOrderValue}.`);
+      return;
+    }
+
+    // FREESHIP is for first order only
+    if (coupon.code === "FREESHIP" && orders.length > 0) {
+      setCouponError("The FREESHIP coupon is valid for first-time orders only.");
       return;
     }
 
@@ -212,7 +316,7 @@ export default function CheckoutClient() {
           phone: phone.trim(),
           address: address.trim(),
           city: city.trim(),
-          state: "Tamil Nadu", // Default state region
+          state: shippingState || "Tamil Nadu",
           pinCode: postalCode.trim(),
         },
         paymentMethod: selectedPayment.toUpperCase(),
@@ -323,7 +427,7 @@ export default function CheckoutClient() {
             <div className="h-px w-8 bg-stone-200" />
             <button
               onClick={() => {
-                if (email && firstName && lastName && address && city && postalCode && phone) {
+                if (email && firstName && lastName && address && city && postalCode && shippingState && phone) {
                   setStep("payment");
                 } else {
                   setFormError("Please fill out all shipping details first.");
@@ -349,6 +453,9 @@ export default function CheckoutClient() {
                 <h2 className="text-xl font-bold flex items-center gap-2" style={{ fontFamily: "var(--font-heading)" }}>
                   <MapPin size={20} className="text-forest-600" /> Contact &amp; Shipping Information
                 </h2>
+                <p className="text-xs font-medium px-3 py-2 rounded-lg" style={{ background: "var(--color-forest-50)", color: "var(--color-forest-700)" }}>
+                  Free shipping is available in Tamil Nadu, Kerala, Karnataka, Telangana &amp; Andhra Pradesh
+                </p>
 
                 {/* Email – always shown and editable */}
                 <div>
@@ -506,6 +613,24 @@ export default function CheckoutClient() {
                         style={{ background: "white", borderColor: "var(--color-stone-200)" }}
                       />
                     </div>
+                    <div>
+                      <label className="block text-sm font-medium mb-1.5" style={{ color: "var(--color-stone-700)" }}>
+                        State {isLookingUpPincode && <span className="text-forest-500 text-xs ml-1">Looking up...</span>}
+                      </label>
+                      <select
+                        required
+                        value={shippingState}
+                        onChange={(e) => setShippingState(e.target.value)}
+                        className="w-full px-4 py-3 rounded-xl border focus:ring-2 focus:ring-forest-200 outline-none transition-all bg-white"
+                        style={{ borderColor: "var(--color-stone-200)" }}
+                      >
+                        <option value="">Select state</option>
+                        {FREE_SHIPPING_STATES.map((s) => (
+                          <option key={s} value={s}>{s}</option>
+                        ))}
+                        <option value="Other">Other</option>
+                      </select>
+                    </div>
 
                     <div className="md:col-span-2">
                       <label className="block text-sm font-medium mb-1.5" style={{ color: "var(--color-stone-700)" }}>Phone Number (for delivery updates)</label>
@@ -526,7 +651,7 @@ export default function CheckoutClient() {
                   <button
                     type="button"
                     onClick={() => {
-                      if (email && firstName && lastName && address && city && postalCode && phone) {
+                      if (email && firstName && lastName && address && city && postalCode && shippingState && phone) {
                         setStep("payment");
                         setFormError("");
                       } else {
@@ -589,25 +714,6 @@ export default function CheckoutClient() {
                     </div>
                   </label>
                   
-                  <label 
-                    className="flex items-center gap-4 p-4 rounded-xl border-2 cursor-pointer transition-all hover:bg-stone-50" 
-                    style={{ 
-                      borderColor: selectedPayment === "cod" ? "var(--color-forest-600)" : "var(--color-stone-200)", 
-                      background: selectedPayment === "cod" ? "var(--color-forest-50)" : "white" 
-                    }}
-                  >
-                    <input 
-                      type="radio" 
-                      name="payment_method" 
-                      checked={selectedPayment === "cod"}
-                      onChange={() => setSelectedPayment("cod")}
-                      className="w-5 h-5 text-forest-600 focus:ring-forest-500" 
-                    />
-                    <div className="flex-1">
-                      <p className="font-bold text-stone-900">Cash on Delivery</p>
-                      <p className="text-sm text-stone-500">Pay when you receive the order</p>
-                    </div>
-                  </label>
                 </div>
 
                 {/* Card Details Section */}
@@ -616,15 +722,28 @@ export default function CheckoutClient() {
                     <div className="space-y-5">
                       <div>
                         <label className="block text-sm font-medium mb-1.5" style={{ color: "var(--color-stone-700)" }}>Card Number</label>
-                        <input 
-                          type="text" 
-                          placeholder="0000 0000 0000 0000" 
-                          value={cardData.number}
-                          onChange={(e) => setCardData({ ...cardData, number: e.target.value.replace(/\D/g, "").slice(0, 16) })}
-                          className="w-full px-4 py-3 rounded-xl border focus:ring-2 focus:ring-forest-200 outline-none transition-all" 
-                          style={{ background: "var(--color-cream-50)", borderColor: "var(--color-stone-200)" }} 
-                          required={selectedPayment === "card"}
-                        />
+                        <div className="relative">
+                          <input 
+                            type="text" 
+                            placeholder="0000 0000 0000 0000" 
+                            value={formatCardNumber(cardData.number)}
+                            onChange={(e) => {
+                              const digits = e.target.value.replace(/\D/g, "");
+                              const isAmex = /^3[47]/.test(digits);
+                              const maxLen = isAmex ? 15 : 16;
+                              setCardData({ ...cardData, number: digits.slice(0, maxLen) });
+                              setDetectedCardType(detectCardType(digits));
+                            }}
+                            className="w-full px-4 py-3 rounded-xl border focus:ring-2 focus:ring-forest-200 outline-none transition-all" 
+                            style={{ background: "var(--color-cream-50)", borderColor: "var(--color-stone-200)", paddingRight: "3rem" }} 
+                            required={selectedPayment === "card"}
+                          />
+                          {detectedCardType && cardBrandIcons[detectedCardType] && (
+                            <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none">
+                              {cardBrandIcons[detectedCardType]}
+                            </div>
+                          )}
+                        </div>
                       </div>
                       <div className="grid grid-cols-2 gap-5">
                         <div>
@@ -660,13 +779,13 @@ export default function CheckoutClient() {
                   <div className="p-6 rounded-xl border mt-6 animate-fade-in" style={{ background: "white", borderColor: "var(--color-stone-200)" }}>
                     <p className="text-sm font-bold mb-4" style={{ color: "var(--color-stone-800)" }}>Choose a UPI option</p>
                     <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                      {["GPay", "Razorpay", "PhonePe", "Netbanking"].map((method) => {
-                        const isSelected = selectedUpi === method;
+                      {upiMethods.map((method) => {
+                        const isSelected = selectedUpi === method.id;
                         return (
                           <button
-                            key={method}
+                            key={method.id}
                             type="button"
-                            onClick={() => setSelectedUpi(method)}
+                            onClick={() => setSelectedUpi(method.id)}
                             className="p-3 rounded-xl border text-sm font-medium transition-all flex flex-col items-center gap-2"
                             style={{ 
                               borderColor: isSelected ? "var(--color-forest-600)" : "var(--color-stone-200)",
@@ -675,15 +794,11 @@ export default function CheckoutClient() {
                             }}
                           >
                             <div 
-                              className="w-8 h-8 rounded-full flex items-center justify-center transition-colors"
-                              style={{ 
-                                background: isSelected ? "var(--color-forest-100)" : "var(--color-stone-100)",
-                                color: isSelected ? "var(--color-forest-600)" : "var(--color-stone-400)"
-                              }}
+                              className="w-10 h-10 flex items-center justify-center transition-colors"
                             >
-                              {method[0]}
+                              {method.icon}
                             </div>
-                            {method}
+                            {method.label}
                           </button>
                         );
                       })}
@@ -821,6 +936,8 @@ export default function CheckoutClient() {
                     {AVAILABLE_COUPONS.map((coupon) => {
                       const isApplied = appliedCoupon?.code === coupon.code;
                       const isSubtotalTooLow = coupon.minOrderValue ? totalPrice < coupon.minOrderValue : false;
+                      const isNotFirstOrder = coupon.code === "FREESHIP" && orders.length > 0;
+                      const isUnavailable = isSubtotalTooLow || isNotFirstOrder;
                       
                       return (
                         <div
@@ -828,7 +945,7 @@ export default function CheckoutClient() {
                           className={`p-3 rounded-xl border transition-all duration-300 ${
                             isApplied 
                               ? "bg-forest-50 border-forest-300 shadow-sm" 
-                              : isSubtotalTooLow 
+                              : isUnavailable
                               ? "bg-stone-50 border-stone-200 opacity-60" 
                               : "bg-white border-stone-200 hover:border-stone-300 hover:shadow-sm"
                           }`}
@@ -848,6 +965,11 @@ export default function CheckoutClient() {
                                     Min: ₹{coupon.minOrderValue}
                                   </span>
                                 )}
+                                {coupon.code === "FREESHIP" && (
+                                  <span className="text-[10px] font-bold text-forest-600 bg-forest-50 px-1.5 py-0.5 rounded border border-forest-100">
+                                    First order only
+                                  </span>
+                                )}
                               </div>
                               <p className="text-xs text-stone-600 font-medium mt-1.5 leading-relaxed font-body">
                                 {coupon.description}
@@ -862,10 +984,10 @@ export default function CheckoutClient() {
                               ) : (
                                 <button
                                   type="button"
-                                  disabled={isSubtotalTooLow}
+                                  disabled={isUnavailable}
                                   onClick={() => handleApplyCoupon(coupon.code)}
                                   className={`text-xs font-bold px-3 py-1.5 rounded-lg transition-all ${
-                                    isSubtotalTooLow
+                                    isUnavailable
                                       ? "bg-stone-100 text-stone-400 cursor-not-allowed"
                                       : "bg-stone-900 text-white hover:bg-forest-700 active:scale-95"
                                   }`}
@@ -879,6 +1001,11 @@ export default function CheckoutClient() {
                           {isSubtotalTooLow && (
                             <p className="text-[10px] font-bold text-red-500 mt-1 flex items-center gap-0.5">
                               Add ₹{coupon.minOrderValue! - totalPrice} more to unlock this offer
+                            </p>
+                          )}
+                          {isNotFirstOrder && (
+                            <p className="text-[10px] font-bold text-red-500 mt-1 flex items-center gap-0.5">
+                              Valid for first order only
                             </p>
                           )}
                         </div>

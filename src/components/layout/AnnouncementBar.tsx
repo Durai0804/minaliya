@@ -10,7 +10,7 @@ export default function AnnouncementBar() {
 
   const announcements = [
     { icon: <Truck size={14} />, text: "Free Shipping on Orders Above ₹499" },
-    { icon: <CreditCard size={14} />, text: "COD Available Across India" },
+    { icon: <CreditCard size={14} />, text: "Free Shipping in TN, KL, KA, TG, AP" },
     { icon: <Phone size={14} />, text: "WhatsApp Order: +91 98765 43210" },
     { text: "100% Pure Wooden Cold Pressed Oils" },
   ];

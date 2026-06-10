@@ -210,7 +210,7 @@ export default function Footer() {
                 We Accept
               </h4>
               <div className="flex gap-2 flex-wrap">
-                {["UPI", "Visa", "MC", "COD"].map((m) => (
+                {["UPI", "Visa", "MC"].map((m) => (
                   <span
                     key={m}
                     className="px-3 py-1.5 rounded-md text-[10px] font-bold"

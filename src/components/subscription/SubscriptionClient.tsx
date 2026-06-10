@@ -157,7 +157,7 @@ const faqs = [
   },
   {
     q: "What payment methods do you accept?",
-    a: "We accept UPI, all major credit/debit cards, net banking, and Cash on Delivery (COD). For subscriptions, we'll send a payment link before each delivery cycle.",
+    a: "We accept UPI, all major credit/debit cards, and net banking. For subscriptions, we'll send a payment link before each delivery cycle.",
   },
   {
     q: "Do you deliver across India?",
