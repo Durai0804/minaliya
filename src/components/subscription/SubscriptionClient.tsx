@@ -233,8 +233,10 @@ export default function SubscriptionClient() {
             SUBSCRIBE &amp; SAVE UP TO 17%
           </div>
 
+          <div className="divider-leaf mx-auto mb-6" />
+
           <h1
-            className="text-3xl sm:text-5xl lg:text-6xl font-bold leading-tight mb-6"
+            className="text-4xl sm:text-5xl lg:text-6xl font-bold leading-tight mb-5"
             style={{
               fontFamily: "var(--font-display)",
               color: "white",
@@ -443,10 +445,9 @@ export default function SubscriptionClient() {
                     <span
                       className="text-4xl font-bold"
                       style={{
-                        fontFamily: "var(--font-display)",
                         color: plan.highlight
                           ? "white"
-                          : "var(--color-stone-900)",
+                          : "var(--color-stone-800)",
                       }}
                     >
                       ₹{plan.price}
